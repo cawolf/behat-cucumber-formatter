@@ -4,6 +4,7 @@ namespace Vanare\BehatCucumberJsonFormatter\Renderer;
 
 use Vanare\BehatCucumberJsonFormatter\Formatter\FormatterInterface;
 use Vanare\BehatCucumberJsonFormatter\Node;
+use Behat\Gherkin\Node\PyStringNode;
 
 class JsonRenderer implements RendererInterface
 {
