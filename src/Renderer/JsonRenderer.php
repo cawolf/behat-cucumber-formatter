@@ -154,15 +154,6 @@ class JsonRenderer implements RendererInterface
 		        'line' => ($step->getLine() + 1)
 	        ];
         }
-        // foreach($step->getArguments() as $argument) {
-	    //     if ($argument instanceof PyStringNode) {
-		//         $result['doc_string'] = [
-		// 	        'content_type' => '',
-		// 	        'value' => (string) $argument,
-		// 	        'line' => ($step->getLine() + 1)
-		//         ];
-	    //     }
-        // }
 
         return $result;
     }
