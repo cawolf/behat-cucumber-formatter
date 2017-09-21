@@ -180,17 +180,18 @@ class Formatter implements FormatterInterface
      */
     public function onBeforeScenarioTested(BehatEvent\BeforeScenarioTested $event)
     {
+        $scenario = new Node\Scenario();
+
         $fullTitle = explode("\n", $event->getScenario()->getTitle());
         if (count($fullTitle) > 1) {
             $title = array_shift($fullTitle);
+            $description = implode("\n", $fullTitle);
+            $scenario->setDescription($description);
         } else {
             $title = implode("\n", $fullTitle);
         }
-        $description = implode("\n", $fullTitle);
 
-        $scenario = new Node\Scenario();
         $scenario->setName($title);
-        $scenario->setDescription($description);
         $scenario->setTags($event->getScenario()->getTags());
         $scenario->setLine($event->getScenario()->getLine());
         $scenario->setType($event->getScenario()->getNodeType());
