@@ -4,7 +4,6 @@ namespace Vanare\BehatCucumberJsonFormatter\Renderer;
 
 use Vanare\BehatCucumberJsonFormatter\Formatter\FormatterInterface;
 use Vanare\BehatCucumberJsonFormatter\Node;
-use Behat\Gherkin\Node\PyStringNode;
 
 class JsonRenderer implements RendererInterface
 {
@@ -148,15 +147,22 @@ class JsonRenderer implements RendererInterface
             'result' => $step->getProcessedResult(),
         ];
 
-        foreach($step->getArguments() as $argument) {
-	        if ($argument instanceof PyStringNode) {
-		        $result['doc_string'] = [
-			        'content_type' => '',
-			        'value' => (string) $argument,
-			        'line' => ($step->getLine() + 1)
-		        ];
-	        }
+        if ($step->hasPystring()) {
+	        $result['doc_string'] = [
+		        'content_type' => '',
+		        'value' => $step->getPystring(),
+		        'line' => ($step->getLine() + 1)
+	        ];
         }
+        // foreach($step->getArguments() as $argument) {
+	    //     if ($argument instanceof PyStringNode) {
+		//         $result['doc_string'] = [
+		// 	        'content_type' => '',
+		// 	        'value' => (string) $argument,
+		// 	        'line' => ($step->getLine() + 1)
+		//         ];
+	    //     }
+        // }
 
         return $result;
     }

@@ -174,6 +174,34 @@ class Step
     }
 
     /**
+     * @return boolean
+     */
+    public function hasPystring()
+    {
+	    $result = false;
+	    foreach($this->arguments as $argument) {
+		     if ($argument instanceof PyStringNode) {
+			     $result = true;
+		     }
+	    }
+	    return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPystring()
+    {
+	    $result = "";
+        foreach($this->argument as $argument) {
+	        if ($argument instanceof PyStringNode) {
+		        $result = (string) $argument;
+	        }
+        }
+        return $result;
+    }
+
+    /**
      * @param mixed $arguments
      */
     public function setArguments($arguments)
