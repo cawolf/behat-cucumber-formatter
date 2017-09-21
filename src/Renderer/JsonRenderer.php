@@ -150,7 +150,7 @@ class JsonRenderer implements RendererInterface
             'result' => $step->getProcessedResult(),
         ];
 
-        if ($step->hasPystring()) {
+        if ($step->getPystring()) {
 	        $result['doc_string'] = [
 		        'content_type' => '',
 		        'value' => $step->getPystring(),
