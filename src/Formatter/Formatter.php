@@ -64,6 +64,8 @@ class Formatter implements FormatterInterface
             TestworkEvent\SuiteTested::AFTER => 'onAfterSuiteTested',
             BehatEvent\FeatureTested::BEFORE => 'onBeforeFeatureTested',
             BehatEvent\FeatureTested::AFTER => 'onAfterFeatureTested',
+            BehatEvent\BackgroundTested::BEFORE => 'onBeforeBackgroundTested',
+            BehatEvent\BackgroundTested::AFTER => 'onAfterBackgroundTested',
             BehatEvent\ScenarioTested::BEFORE => 'onBeforeScenarioTested',
             BehatEvent\ScenarioTested::AFTER => 'onAfterScenarioTested',
             BehatEvent\OutlineTested::BEFORE => 'onBeforeOutlineTested',
@@ -173,6 +175,20 @@ class Formatter implements FormatterInterface
     public function onAfterFeatureTested(BehatEvent\AfterFeatureTested $event)
     {
         $this->currentSuite->addFeature($this->currentFeature);
+    }
+
+    /**
+     * @param BehatEvent\BeforeBackgroundTested $event
+     */
+    public function onBeforeBackgroundTested(BehatEvent\BeforeBackgroundTested $event)
+    {
+    }
+
+    /**
+     * @param BehatEvent\AfterBackgroundTested $event
+     */
+    public function onAfterBackgroundTested(BehatEvent\AfterBackgroundTested $event)
+    {
     }
 
     /**
