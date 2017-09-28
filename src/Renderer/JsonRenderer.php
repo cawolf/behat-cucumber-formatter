@@ -87,6 +87,9 @@ class JsonRenderer implements RendererInterface
 
         if ($feature->getScenarios()) {
             $currentFeature['elements'] = [];
+            if($feature->getBackground()) {
+	            array_push($currentFeature['elements'], $this->processScenario($feature->getBackground()));
+            }
             foreach ($feature->getScenarios() as $scenario) {
                 array_push($currentFeature['elements'], $this->processScenario($scenario));
             }

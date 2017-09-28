@@ -65,7 +65,6 @@ class Formatter implements FormatterInterface
             BehatEvent\FeatureTested::BEFORE => 'onBeforeFeatureTested',
             BehatEvent\FeatureTested::AFTER => 'onAfterFeatureTested',
             BehatEvent\BackgroundTested::BEFORE => 'onBeforeBackgroundTested',
-            BehatEvent\BackgroundTested::AFTER => 'onAfterBackgroundTested',
             BehatEvent\ScenarioTested::BEFORE => 'onBeforeScenarioTested',
             BehatEvent\ScenarioTested::AFTER => 'onAfterScenarioTested',
             BehatEvent\OutlineTested::BEFORE => 'onBeforeOutlineTested',
@@ -182,13 +181,25 @@ class Formatter implements FormatterInterface
      */
     public function onBeforeBackgroundTested(BehatEvent\BeforeBackgroundTested $event)
     {
-    }
+	    if (! $this->currentFeature->getBackground()) {
+		    $background = new Node\Scenario();
 
-    /**
-     * @param BehatEvent\AfterBackgroundTested $event
-     */
-    public function onAfterBackgroundTested(BehatEvent\AfterBackgroundTested $event)
-    {
+		    $fullTitle = explode("\n", $event->getScenario()->getTitle());
+		    if (count($fullTitle) > 1) {
+			    $title = array_shift($fullTitle);
+			    $description = implode("\n", $fullTitle);
+			    $background->setDescription($description);
+		    } else {
+			    $title = implode("\n", $fullTitle);
+		    }
+
+		    $background->setName($title);
+		    $background->setLine($event->getScenario()->getLine());
+		    $background->setType($event->getScenario()->getNodeType());
+		    $background->setKeyword($event->getScenario()->getKeyword());
+		    $background->setFeature($this->currentFeature);
+		    $this->currentFeature->setBackground($background);
+	    }
     }
 
     /**

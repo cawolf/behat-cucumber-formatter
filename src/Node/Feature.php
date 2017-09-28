@@ -62,6 +62,11 @@ class Feature
     private $line = 0;
 
     /**
+     * @var Scenario
+     */
+    private $background;
+
+    /**
      * @var Scenario[]
      */
     private $scenarios;
@@ -200,6 +205,22 @@ class Feature
     public function getFilenameForReport()
     {
         return dirname($this->file) . FileOutputPrinter::FILE_SEPARATOR . basename($this->file, '.feature');
+    }
+
+    /**
+     * @return Scenario
+     */
+    public function getBackground()
+    {
+        return $this->background;
+    }
+
+    /**
+     * @param Scenario $background
+     */
+    public function setBackground($background)
+    {
+        $this->background = $background;
     }
 
     /**
