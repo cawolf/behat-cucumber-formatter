@@ -40,6 +40,9 @@ class Formatter implements FormatterInterface
     /** @var Node\Feature */
     private $currentFeature;
 
+    /** @var boolean */
+	private $proceedingBackground = false;
+
     /** @var Node\Scenario */
     private $currentScenario;
 
@@ -65,6 +68,7 @@ class Formatter implements FormatterInterface
             BehatEvent\FeatureTested::BEFORE => 'onBeforeFeatureTested',
             BehatEvent\FeatureTested::AFTER => 'onAfterFeatureTested',
             BehatEvent\BackgroundTested::BEFORE => 'onBeforeBackgroundTested',
+            BehatEvent\BackgroundTested::AFTER => 'onAfterBackgroundTested',
             BehatEvent\ScenarioTested::BEFORE => 'onBeforeScenarioTested',
             BehatEvent\ScenarioTested::AFTER => 'onAfterScenarioTested',
             BehatEvent\OutlineTested::BEFORE => 'onBeforeOutlineTested',
@@ -182,6 +186,7 @@ class Formatter implements FormatterInterface
     public function onBeforeBackgroundTested(BehatEvent\BeforeBackgroundTested $event)
     {
 	    if (! $this->currentFeature->getBackground()) {
+		    $this->proceedingBackground = true;
 		    $background = new Node\Scenario();
 
 		    $fullTitle = explode("\n", $event->getScenario()->getTitle());
@@ -200,6 +205,14 @@ class Formatter implements FormatterInterface
 		    $background->setFeature($this->currentFeature);
 		    $this->currentFeature->setBackground($background);
 	    }
+    }
+
+    /**
+     * @param BehatEvent\AfterBackgroundTested $event
+     */
+    public function onAfterBackgroundTested(BehatEvent\AfterBackgroundTested $event)
+    {
+	    $this->proceedingBackground = false;
     }
 
     /**
@@ -337,8 +350,12 @@ class Formatter implements FormatterInterface
         $step->setMatch($match);
 
         $this->processStep($step, $result);
-
-        $this->currentScenario->addStep($step);
+        if ($this->proceedingBackground) {
+	        $this->currentFeature->getBackground()->addStep($step);
+        }
+        else {
+	        $this->currentScenario->addStep($step);
+	    }
     }
 
     /** @inheritdoc */
