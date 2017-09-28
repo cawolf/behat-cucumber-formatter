@@ -73,6 +73,8 @@ class Formatter implements FormatterInterface
             BehatEvent\ScenarioTested::AFTER => 'onAfterScenarioTested',
             BehatEvent\OutlineTested::BEFORE => 'onBeforeOutlineTested',
             BehatEvent\OutlineTested::AFTER => 'onAfterOutlineTested',
+            // BehatEvent\ExampleTested::BEFORE => 'onBeforeExampleTested',
+            // BehatEvent\ExampleTested::AFTER => 'onAfterExampleTested',
             BehatEvent\StepTested::BEFORE => 'onBeforeStepTested',
             BehatEvent\StepTested::AFTER => 'onAfterStepTested',
         ];
@@ -258,6 +260,48 @@ class Formatter implements FormatterInterface
     }
 
     /**
+     * @param BehatEvent\BeforeScenarioTested $event
+     */
+    public function onBeforeExampleTested(BehatEvent\BeforeScenarioTested $event)
+    {
+        $scenario = new Node\Scenario();
+
+        $fullTitle = explode("\n", $event->getScenario()->getTitle());
+        if (count($fullTitle) > 1) {
+            $title = array_shift($fullTitle);
+            $description = implode("\n", $fullTitle);
+            $scenario->setDescription($description);
+        } else {
+            $title = implode("\n", $fullTitle);
+        }
+
+        $scenario->setName($title);
+        $scenario->setTags($event->getScenario()->getTags());
+        $scenario->setLine($event->getScenario()->getLine());
+        $scenario->setType('scenario_outline');
+        $scenario->setKeyword($event->getScenario()->getKeyword());
+        $scenario->setFeature($this->currentFeature);
+        $this->currentScenario = $scenario;
+    }
+
+    /**
+     * @param BehatEvent\AfterScenarioTested $event
+     */
+    public function onAfterExampleTested(BehatEvent\AfterScenarioTested $event)
+    {
+        $scenarioPassed = $event->getTestResult()->isPassed();
+
+        if ($scenarioPassed) {
+            $this->currentFeature->addPassedScenario();
+        } else {
+            $this->currentFeature->addFailedScenario();
+        }
+
+        $this->currentScenario->setPassed($event->getTestResult()->isPassed());
+        $this->currentFeature->addScenario($this->currentScenario);
+    }
+
+    /**
      * @param BehatEvent\BeforeOutlineTested $event
      */
     public function onBeforeOutlineTested(BehatEvent\BeforeOutlineTested $event)
@@ -279,16 +323,20 @@ class Formatter implements FormatterInterface
     {
         /** @var TestResults $testResults */
         $testResults = $event->getTestResult();
-        $stepCount = count($event->getOutline()->getSteps());
+        $backgroundStepCount = count($this->currentFeature->getBackground()->getSteps()); // or 0
+        $scenarioStepCount = count($event->getOutline()->getSteps());
+        foreach($this->currentScenario->getSteps() as $step) {
+	        print_r($step->getName()."\n");
+        }
         foreach ($testResults as $i => $testResult) {
             $example = clone $this->currentScenario;
 
             // use correct line number of example row
             $line = $event->getOutline()->getExampleTable()->getRowLine($i + 1);
             $example->setLine($line);
-
             // remove all steps and attach only steps for that example row
-            $steps = array_slice($example->getSteps(), $i * $stepCount, $stepCount);
+            $stepOffset = $i * ($scenarioStepCount + $backgroundStepCount) + $backgroundStepCount;
+            $steps = array_slice($example->getSteps(), $stepOffset, $scenarioStepCount);
             $example->setSteps($steps);
 
             $scenarioPassed = $testResult->isPassed();
