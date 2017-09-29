@@ -179,11 +179,11 @@ class Step
      */
     public function getPystring()
     {
-	    $result = '';
+        $result = '';
         foreach($this->arguments as $argument) {
-	        if ($argument instanceof PyStringNode) {
-		        $result = (string) $argument;
-	        }
+            if ($argument instanceof PyStringNode) {
+                $result = (string) $argument;
+            }
         }
         return $result;
     }

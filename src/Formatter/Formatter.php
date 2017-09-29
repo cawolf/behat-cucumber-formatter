@@ -41,7 +41,7 @@ class Formatter implements FormatterInterface
     private $currentFeature;
 
     /** @var boolean */
-	private $proceedingBackground = false;
+    private $proceedingBackground = false;
 
     /** @var Node\Scenario */
     private $currentScenario;
@@ -185,26 +185,26 @@ class Formatter implements FormatterInterface
      */
     public function onBeforeBackgroundTested(BehatEvent\BeforeBackgroundTested $event)
     {
-	    if (! $this->currentFeature->getBackground()) {
-		    $this->proceedingBackground = true;
-		    $background = new Node\Scenario();
+        if (! $this->currentFeature->getBackground()) {
+            $this->proceedingBackground = true;
+            $background = new Node\Scenario();
 
-		    $fullTitle = explode("\n", $event->getScenario()->getTitle());
-		    if (count($fullTitle) > 1) {
-			    $title = array_shift($fullTitle);
-			    $description = implode("\n", $fullTitle);
-			    $background->setDescription($description);
-		    } else {
-			    $title = implode("\n", $fullTitle);
-		    }
+            $fullTitle = explode("\n", $event->getScenario()->getTitle());
+            if (count($fullTitle) > 1) {
+                $title = array_shift($fullTitle);
+                $description = implode("\n", $fullTitle);
+                $background->setDescription($description);
+            } else {
+                $title = implode("\n", $fullTitle);
+            }
 
-		    $background->setName($title);
-		    $background->setLine($event->getScenario()->getLine());
-		    $background->setType($event->getScenario()->getNodeType());
-		    $background->setKeyword($event->getScenario()->getKeyword());
-		    $background->setFeature($this->currentFeature);
-		    $this->currentFeature->setBackground($background);
-	    }
+            $background->setName($title);
+            $background->setLine($event->getScenario()->getLine());
+            $background->setType($event->getScenario()->getNodeType());
+            $background->setKeyword($event->getScenario()->getKeyword());
+            $background->setFeature($this->currentFeature);
+            $this->currentFeature->setBackground($background);
+        }
     }
 
     /**
@@ -212,7 +212,7 @@ class Formatter implements FormatterInterface
      */
     public function onAfterBackgroundTested(BehatEvent\AfterBackgroundTested $event)
     {
-	    $this->proceedingBackground = false;
+        $this->proceedingBackground = false;
     }
 
     /**
@@ -280,10 +280,10 @@ class Formatter implements FormatterInterface
         /** @var TestResults $testResults */
         $testResults = $event->getTestResult();
         if ($this->currentFeature->getBackground()) {
-	        $backgroundStepCount = count($this->currentFeature->getBackground()->getSteps());
+            $backgroundStepCount = count($this->currentFeature->getBackground()->getSteps());
         }
         else {
-	        $backgroundStepCount = 0;
+            $backgroundStepCount = 0;
         }
         $scenarioStepCount = count($event->getOutline()->getSteps());
         foreach ($testResults as $i => $testResult) {
@@ -357,11 +357,11 @@ class Formatter implements FormatterInterface
 
         $this->processStep($step, $result);
         if ($this->proceedingBackground) {
-	        $this->currentFeature->getBackground()->addStep($step);
+            $this->currentFeature->getBackground()->addStep($step);
         }
         else {
-	        $this->currentScenario->addStep($step);
-	    }
+            $this->currentScenario->addStep($step);
+        }
     }
 
     /** @inheritdoc */
