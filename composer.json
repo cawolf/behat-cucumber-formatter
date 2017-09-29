@@ -2,7 +2,7 @@
   "name": "cawolf/behat-cucumber-json-formatter",
   "description": "Behat extension for generating json reports",
   "keywords": ["behat", "json", "formatter", "cucumber", "jenkins"],
-  "homepage": "https://github.com/8p8c/behat-cucumber-formatter",
+  "homepage": "https://github.com/cawolf/behat-cucumber-formatter",
   "license": "MIT",
   "authors": [
     {
