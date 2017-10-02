@@ -293,7 +293,8 @@ class Formatter implements FormatterInterface
             $line = $event->getOutline()->getExampleTable()->getRowLine($i + 1);
             $example->setLine($line);
             // remove all steps and attach only steps for that example row
-            $stepOffset = $i * ($scenarioStepCount + $backgroundStepCount) + $backgroundStepCount;
+            //$stepOffset = $i * ($scenarioStepCount + $backgroundStepCount) + $backgroundStepCount;
+            $stepOffset = $i * ($scenarioStepCount + $backgroundStepCount);
             $steps = array_slice($example->getSteps(), $stepOffset, $scenarioStepCount);
             $example->setSteps($steps);
 
