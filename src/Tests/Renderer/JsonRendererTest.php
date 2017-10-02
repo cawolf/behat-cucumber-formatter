@@ -105,7 +105,7 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
 
         // Scenario
         $scenario = array_pop($feature['elements']);
-        $keys = ['id', 'keyword', 'name', 'line', 'description', 'type', 'steps', 'tags'];
+        $keys = ['id', 'keyword', 'name', 'line', 'type', 'steps', 'tags'];
         self::assertArrayHasKeys($keys, $scenario);
         self::assertTrue(is_array($scenario['steps']));
         self::assertTrue(is_array($scenario['examples']));
