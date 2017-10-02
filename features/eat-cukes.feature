@@ -24,14 +24,12 @@ Feature: Eat cukes Example
       [
         {
           "id": "eat-cukes-in-lot",
-          "description": "",
           "name": "Eat cukes in lot",
           "keyword": "Feature",
           "line": 1,
           "elements": [
             {
-              "id": "eat-cukes-in-lot;eating-many-cukes---11",
-              "description": "",
+              "id": "eat-cukes-in-lot;eating-many-cukes",
               "name": "Eating many cukes",
               "keyword": "Scenario Outline",
               "line": 11,
@@ -88,11 +86,10 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario_outline"
+              "type": "scenario"
             },
             {
-              "id": "eat-cukes-in-lot;eating-many-cukes---12",
-              "description": "",
+              "id": "eat-cukes-in-lot;eating-many-cukes",
               "name": "Eating many cukes",
               "keyword": "Scenario Outline",
               "line": 12,
@@ -150,11 +147,10 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario_outline"
+              "type": "scenario"
             },
             {
-              "id": "eat-cukes-in-lot;eating-many-cukes---13",
-              "description": "",
+              "id": "eat-cukes-in-lot;eating-many-cukes",
               "name": "Eating many cukes",
               "keyword": "Scenario Outline",
               "line": 13,
@@ -212,11 +208,10 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario_outline"
+              "type": "scenario"
             },
             {
-              "id": "eat-cukes-in-lot;eating-many-cukes---14",
-              "description": "",
+              "id": "eat-cukes-in-lot;eating-many-cukes",
               "name": "Eating many cukes",
               "keyword": "Scenario Outline",
               "line": 14,
@@ -273,10 +268,11 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario_outline"
+              "type": "scenario"
             }
           ],
-          "uri": "features/feature.feature"
+          "uri": "features/feature.feature",
+          "description": ""
         }
       ]
       """
