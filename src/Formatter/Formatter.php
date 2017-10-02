@@ -40,6 +40,9 @@ class Formatter implements FormatterInterface
     /** @var Node\Feature */
     private $currentFeature;
 
+    /** @var boolean */
+    private $proceedingBackground = false;
+
     /** @var Node\Scenario */
     private $currentScenario;
 
@@ -64,6 +67,8 @@ class Formatter implements FormatterInterface
             TestworkEvent\SuiteTested::AFTER => 'onAfterSuiteTested',
             BehatEvent\FeatureTested::BEFORE => 'onBeforeFeatureTested',
             BehatEvent\FeatureTested::AFTER => 'onAfterFeatureTested',
+            BehatEvent\BackgroundTested::BEFORE => 'onBeforeBackgroundTested',
+            BehatEvent\BackgroundTested::AFTER => 'onAfterBackgroundTested',
             BehatEvent\ScenarioTested::BEFORE => 'onBeforeScenarioTested',
             BehatEvent\ScenarioTested::AFTER => 'onAfterScenarioTested',
             BehatEvent\OutlineTested::BEFORE => 'onBeforeOutlineTested',
@@ -176,21 +181,57 @@ class Formatter implements FormatterInterface
     }
 
     /**
+     * @param BehatEvent\BeforeBackgroundTested $event
+     */
+    public function onBeforeBackgroundTested(BehatEvent\BeforeBackgroundTested $event)
+    {
+        if (! $this->currentFeature->getBackground()) {
+            $this->proceedingBackground = true;
+            $background = new Node\Scenario();
+
+            $fullTitle = explode("\n", $event->getScenario()->getTitle());
+            if (count($fullTitle) > 1) {
+                $title = array_shift($fullTitle);
+                $description = implode("\n", $fullTitle);
+                $background->setDescription($description);
+            } else {
+                $title = implode("\n", $fullTitle);
+            }
+
+            $background->setName($title);
+            $background->setLine($event->getScenario()->getLine());
+            $background->setType($event->getScenario()->getNodeType());
+            $background->setKeyword($event->getScenario()->getKeyword());
+            $background->setFeature($this->currentFeature);
+            $this->currentFeature->setBackground($background);
+        }
+    }
+
+    /**
+     * @param BehatEvent\AfterBackgroundTested $event
+     */
+    public function onAfterBackgroundTested(BehatEvent\AfterBackgroundTested $event)
+    {
+        $this->proceedingBackground = false;
+    }
+
+    /**
      * @param BehatEvent\BeforeScenarioTested $event
      */
     public function onBeforeScenarioTested(BehatEvent\BeforeScenarioTested $event)
     {
+        $scenario = new Node\Scenario();
+
         $fullTitle = explode("\n", $event->getScenario()->getTitle());
         if (count($fullTitle) > 1) {
             $title = array_shift($fullTitle);
+            $description = implode("\n", $fullTitle);
+            $scenario->setDescription($description);
         } else {
             $title = implode("\n", $fullTitle);
         }
-        $description = implode("\n", $fullTitle);
 
-        $scenario = new Node\Scenario();
         $scenario->setName($title);
-        $scenario->setDescription($description);
         $scenario->setTags($event->getScenario()->getTags());
         $scenario->setLine($event->getScenario()->getLine());
         $scenario->setType($event->getScenario()->getNodeType());
@@ -225,7 +266,7 @@ class Formatter implements FormatterInterface
         $scenario->setName($event->getOutline()->getTitle());
         $scenario->setTags($event->getOutline()->getTags());
         $scenario->setLine($event->getOutline()->getLine());
-        $scenario->setType('scenario_outline');
+        $scenario->setType('scenario');
         $scenario->setKeyword($event->getOutline()->getKeyword());
         $scenario->setFeature($this->currentFeature);
         $this->currentScenario = $scenario;
@@ -238,16 +279,22 @@ class Formatter implements FormatterInterface
     {
         /** @var TestResults $testResults */
         $testResults = $event->getTestResult();
-        $stepCount = count($event->getOutline()->getSteps());
+        if ($this->currentFeature->getBackground()) {
+            $backgroundStepCount = count($this->currentFeature->getBackground()->getSteps());
+        }
+        else {
+            $backgroundStepCount = 0;
+        }
+        $scenarioStepCount = count($event->getOutline()->getSteps());
         foreach ($testResults as $i => $testResult) {
             $example = clone $this->currentScenario;
 
             // use correct line number of example row
             $line = $event->getOutline()->getExampleTable()->getRowLine($i + 1);
             $example->setLine($line);
-
             // remove all steps and attach only steps for that example row
-            $steps = array_slice($example->getSteps(), $i * $stepCount, $stepCount);
+            $stepOffset = $i * ($scenarioStepCount + $backgroundStepCount);
+            $steps = array_slice($example->getSteps(), $stepOffset, $scenarioStepCount);
             $example->setSteps($steps);
 
             $scenarioPassed = $testResult->isPassed();
@@ -309,8 +356,12 @@ class Formatter implements FormatterInterface
         $step->setMatch($match);
 
         $this->processStep($step, $result);
-
-        $this->currentScenario->addStep($step);
+        if ($this->proceedingBackground) {
+            $this->currentFeature->getBackground()->addStep($step);
+        }
+        else {
+            $this->currentScenario->addStep($step);
+        }
     }
 
     /** @inheritdoc */

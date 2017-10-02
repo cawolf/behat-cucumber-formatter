@@ -15,6 +15,11 @@
       "name": "Christian Alexander Wolf",
       "email": "mail@cawolf.de",
       "role": "Developer"
+    },
+    {
+      "name": "Dmitry Nikolaev",
+      "email": "cameltheman@gmail.com",
+      "role": "Developer"
     }
   ],
   "require": {

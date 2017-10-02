@@ -87,6 +87,9 @@ class JsonRenderer implements RendererInterface
 
         if ($feature->getScenarios()) {
             $currentFeature['elements'] = [];
+            if($feature->getBackground()) {
+                array_push($currentFeature['elements'], $this->processScenario($feature->getBackground()));
+            }
             foreach ($feature->getScenarios() as $scenario) {
                 array_push($currentFeature['elements'], $this->processScenario($scenario));
             }
@@ -107,10 +110,13 @@ class JsonRenderer implements RendererInterface
             'keyword' => $scenario->getKeyword(),
             'name' => $scenario->getName(),
             'line' => $scenario->getLine(),
-            'description' => $scenario->getDescription(),
             'type' => $scenario->getType(),
             'steps' => [],
         ];
+
+        if ($scenario->getDescription()) {
+            $currentScenario['description'] = $scenario->getDescription();
+        }
 
         if ($scenario->getTags()) {
             $currentScenario['tags'] = $this->processTags($scenario->getTags());
@@ -146,6 +152,14 @@ class JsonRenderer implements RendererInterface
             'match' => $step->getMatch(),
             'result' => $step->getProcessedResult(),
         ];
+
+        if ($step->getPystring()) {
+            $result['doc_string'] = [
+                'content_type' => '',
+                'value' => $step->getPystring(),
+                'line' => ($step->getLine() + 1)
+            ];
+        }
 
         return $result;
     }

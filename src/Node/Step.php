@@ -3,6 +3,7 @@
 namespace Vanare\BehatCucumberJsonFormatter\Node;
 
 use Behat\Behat\Tester\Result\StepResult;
+use Behat\Gherkin\Node\PyStringNode;
 
 class Step
 {
@@ -171,6 +172,20 @@ class Step
     public function getArguments()
     {
         return $this->arguments;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPystring()
+    {
+        $result = '';
+        foreach($this->arguments as $argument) {
+            if ($argument instanceof PyStringNode) {
+                $result = (string) $argument;
+            }
+        }
+        return $result;
     }
 
     /**
