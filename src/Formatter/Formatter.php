@@ -341,6 +341,9 @@ class Formatter implements FormatterInterface
         $step->setResultCode($result->getResultCode());
         $step->setDuration($this->timer->getSeconds());
 
+        if ($result->getCallResult()->getStdOut()) {
+            $step->setOutput($result->getCallResult()->getStdOut());
+        }
 
         $match = ['location' => $result->getStepDefinition()->getPath()];
         $arguments = [];

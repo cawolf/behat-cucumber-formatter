@@ -158,6 +158,10 @@ class JsonRenderer implements RendererInterface
             ];
         }
 
+        if ($step->getOutput()) {
+            $result['output'] = [$step->getOutput()];
+        }
+
         return $result;
     }
 
