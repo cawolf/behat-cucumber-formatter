@@ -112,11 +112,8 @@ class JsonRenderer implements RendererInterface
             'line' => $scenario->getLine(),
             'type' => $scenario->getType(),
             'steps' => [],
+            'description' => $scenario->getDescription(),
         ];
-
-        if ($scenario->getDescription()) {
-            $currentScenario['description'] = $scenario->getDescription();
-        }
 
         if ($scenario->getTags()) {
             $currentScenario['tags'] = $this->processTags($scenario->getTags());

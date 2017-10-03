@@ -86,7 +86,8 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario"
+              "type": "scenario",
+              "description": ""
             },
             {
               "id": "eat-cukes-in-lot;eating-many-cukes",
@@ -147,7 +148,8 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario"
+              "type": "scenario",
+              "description": ""
             },
             {
               "id": "eat-cukes-in-lot;eating-many-cukes",
@@ -208,7 +210,8 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario"
+              "type": "scenario",
+              "description": ""
             },
             {
               "id": "eat-cukes-in-lot;eating-many-cukes",
@@ -268,7 +271,8 @@ Feature: Eat cukes Example
                   }
                 }
               ],
-              "type": "scenario"
+              "type": "scenario",
+              "description": ""
             }
           ],
           "uri": "features/feature.feature",
