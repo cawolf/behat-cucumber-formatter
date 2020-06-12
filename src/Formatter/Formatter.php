@@ -43,6 +43,9 @@ class Formatter implements FormatterInterface
     /** @var Node\Scenario */
     private $currentScenario;
 
+    /** @var bool */
+    private $resultFilePerSuite = false;
+
     /**
      * @param string $fileNamePrefix
      * @param string $outputDir
@@ -76,6 +79,11 @@ class Formatter implements FormatterInterface
     /** @inheritdoc */
     public function setFileName($fileName) {
         $this->printer->setResultFileName($fileName);
+    }
+
+    /** @inheritdoc */
+    public function setResultFilePerSuite(bool $enabled) {
+        $this->resultFilePerSuite = $enabled;
     }
 
     /** @inheritdoc */
@@ -128,6 +136,16 @@ class Formatter implements FormatterInterface
         $this->timer->stop();
 
         $this->renderer->render();
+
+        if ($this->resultFilePerSuite) {
+            foreach ($this->suites as $suite) {
+                $this->printer->setResultFileName('report-' . $suite->getName());
+                $suiteResult = $this->renderer->getResultForSuite($suite->getName());
+                $this->printer->write($suiteResult);
+            }
+            return;
+        }
+
         if (!$this->printer->getResultFileName()) {
             $this->printer->setResultFileName(
                 str_replace(

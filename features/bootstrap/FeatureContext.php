@@ -17,6 +17,12 @@ class FeatureContext implements Context
     /** @var string */
     private $workingDir;
 
+    /** @var string */
+    private $reportsDir;
+
+    /** @var bool */
+    protected $resultFilePerSuiteEnabled;
+
     /**
      * Cleans test folders in the temporary directory.
      *
@@ -60,7 +66,8 @@ class FeatureContext implements Context
     {
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'behat' . DIRECTORY_SEPARATOR .
             md5(microtime() . rand(0, 10000));
-        $reportsDir = $dir . DIRECTORY_SEPARATOR . 'reports';
+        $this->reportsDir = $dir . DIRECTORY_SEPARATOR . 'reports';
+
         // create directories
         mkdir(
             sprintf(
@@ -72,23 +79,9 @@ class FeatureContext implements Context
             true
         );
         mkdir($dir . DIRECTORY_SEPARATOR . 'junit');
-        mkdir($reportsDir);
+        mkdir($this->reportsDir);
 
-        // create configuration
-        file_put_contents($dir . DIRECTORY_SEPARATOR . 'behat.yml', <<<EOF
-default:
-    suites:
-        default:
-            paths:
-                - "$dir"
-            contexts:
-                - ExampleFeatureContext
-    extensions:
-        Vanare\BehatCucumberJsonFormatter\Extension:
-            fileNamePrefix: report
-            outputDir: "$reportsDir"
-EOF
-        );
+        $this->writeBehatConfigForTests($dir);
 
         // copy context
         copy(
@@ -120,7 +113,31 @@ EOF
      */
     public function iHaveTheFollowingFeature(PyStringNode $string)
     {
-        file_put_contents($this->workingDir . '/features/feature.feature', $string->getRaw());
+        $this->iHaveTheFollowingFeatureFileStoredIn('feature.feature', '', $string);
+    }
+
+    /**
+     * @Given I have the following feature file :fileName stored in :subDirectory:
+     */
+    public function iHaveTheFollowingFeatureFileStoredIn($fileName, $subDirectory = '', PyStringNode $string)
+    {
+        $filePath = $this->workingDir . '/features' . (!empty($subDirectory) ? '/' . $subDirectory : '') . '/' . $fileName;
+        if (!empty($subDirectory) && !file_exists($subDirectory)) {
+            mkdir(dirname($filePath), 0777, true);
+        }
+        file_put_contents($filePath, $string->getRaw());
+    }
+
+    /**
+     * @Given I have the enabled the "resultFilePerSuite" option
+     */
+    public function iHaveTheEnabledTheResultFilePerSuiteOption()
+    {
+        // manipulate the behat config
+        $this->resultFilePerSuiteEnabled = true;
+        $this->writeBehatConfigForTests($this->workingDir, [
+            'resultFilePerSuite' => 'true'
+        ]);
     }
 
     /**
@@ -131,10 +148,11 @@ EOF
         $this->process->setWorkingDirectory($this->workingDir);
         $this->process->setCommandLine(
             sprintf(
-                '%s %s -c %s -s default --no-interaction -f cucumber_json',
+                '%s %s -c %s %s --no-interaction -f cucumber_json',
                 $this->phpBin,
                 escapeshellarg(BEHAT_BIN_PATH),
-                $this->workingDir . DIRECTORY_SEPARATOR . 'behat.yml'
+                $this->workingDir . DIRECTORY_SEPARATOR . 'behat.yml',
+                $this->resultFilePerSuiteEnabled ? '' : '-s default'
             )
         );
         // Don't reset the LANG variable on HHVM, because it breaks HHVM itself
@@ -170,6 +188,23 @@ EOF
     }
 
     /**
+     * @Then :count result file should be generated
+     * @Then :count result files should be generated
+     */
+    public function resultFileShouldBeGenerated(int $count)
+    {
+        $reportFiles = glob(
+            sprintf(
+                '%1$s%2$sreports%2$sreport*.json',
+                $this->workingDir,
+                DIRECTORY_SEPARATOR
+            )
+        );
+        PHPUnit_Framework_Assert::assertCount($count, $reportFiles);
+    }
+
+
+    /**
      * Removes the dynamic parts of a result, like the feature path and durations.
      *
      * @param array $array
@@ -186,5 +221,35 @@ EOF
             }
         }
         return $array;
+    }
+
+    private function writeBehatConfigForTests(string $dir, array $extraOptions = [])
+    {
+        // create configuration
+        $reportsDir = $this->reportsDir;
+        $content = <<<EOF
+default:
+    suites:
+        default:
+            paths:
+                - "$dir/features"
+                - "~$dir/features/othersuite"
+            contexts:
+                - ExampleFeatureContext
+        othersuite:
+            paths:
+                - "$dir/features/othersuite"
+            contexts:
+                - ExampleFeatureContext
+    extensions:
+        Vanare\BehatCucumberJsonFormatter\Extension:
+            fileNamePrefix: report
+            outputDir: "$reportsDir"
+EOF;
+        $content .= implode("", array_map(function ($key, $value) {
+            return "\n            $key: $value";
+        }, array_keys($extraOptions), $extraOptions));
+
+        file_put_contents($dir . DIRECTORY_SEPARATOR . 'behat.yml', $content);
     }
 }

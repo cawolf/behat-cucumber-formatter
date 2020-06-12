@@ -40,6 +40,7 @@ class Extension implements ExtensionInterface
         $builder->children()->scalarNode('fileNamePrefix')->defaultValue('report');
         $builder->children()->scalarNode('outputDir')->defaultValue('build/tests');
         $builder->children()->scalarNode('fileName');
+        $builder->children()->booleanNode('resultFilePerSuite')->defaultFalse();
     }
 
     /**
@@ -56,6 +57,7 @@ class Extension implements ExtensionInterface
         if (!empty($config['fileName'])) {
             $definition->addMethodCall('setFileName', [$config['fileName']]);
         }
+        $definition->addMethodCall('setResultFilePerSuite', [$config['resultFilePerSuite']]);
 
         $container
             ->setDefinition('json.formatter', $definition)
