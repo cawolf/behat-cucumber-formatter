@@ -53,4 +53,12 @@ class Suite
     {
         $this->features[] = $feature;
     }
+
+    /**
+     * @return string
+     */
+    public function getFilenameForReport()
+    {
+        return $this->getName();
+    }
 }

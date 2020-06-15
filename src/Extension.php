@@ -37,7 +37,7 @@ class Extension implements ExtensionInterface
      */
     public function configure(ArrayNodeDefinition $builder)
     {
-        $builder->children()->scalarNode('fileNamePrefix')->defaultValue('report');
+        $builder->children()->scalarNode('fileNamePrefix')->defaultValue('');
         $builder->children()->scalarNode('outputDir')->defaultValue('build/tests');
         $builder->children()->scalarNode('fileName');
         $builder->children()->booleanNode('resultFilePerSuite')->defaultFalse();

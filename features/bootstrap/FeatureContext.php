@@ -113,7 +113,7 @@ class FeatureContext implements Context
      */
     public function iHaveTheFollowingFeature(PyStringNode $string)
     {
-        $this->iHaveTheFollowingFeatureFileStoredIn('feature.feature', '', $string);
+        $this->iHaveTheFollowingFeatureFileStoredIn('feature.feature', 'default', $string);
     }
 
     /**
@@ -141,9 +141,22 @@ class FeatureContext implements Context
     }
 
     /**
+     * @When I run behat with the converter and no specific suite is specified
+     */
+    public function iRunBehatWithTheConverterAndNoSpecificSuiteIsSpecified()
+    {
+        $this->runBehatWithConverter();
+    }
+
+    /**
      * @When I run behat with the converter
      */
     public function iRunBehatWithTheConverter()
+    {
+        $this->runBehatWithConverter('-s default');
+    }
+
+    protected function runBehatWithConverter($extraParameters = '')
     {
         $this->process->setWorkingDirectory($this->workingDir);
         $this->process->setCommandLine(
@@ -152,7 +165,7 @@ class FeatureContext implements Context
                 $this->phpBin,
                 escapeshellarg(BEHAT_BIN_PATH),
                 $this->workingDir . DIRECTORY_SEPARATOR . 'behat.yml',
-                $this->resultFilePerSuiteEnabled ? '' : '-s default'
+                !empty($extraParameters) ? $extraParameters : ''
             )
         );
         // Don't reset the LANG variable on HHVM, because it breaks HHVM itself
@@ -170,13 +183,7 @@ class FeatureContext implements Context
      */
     public function theResultFileWillBe(PyStringNode $string)
     {
-        $reportFiles = glob(
-            sprintf(
-                '%1$s%2$sreports%2$sreport*.json',
-                $this->workingDir,
-                DIRECTORY_SEPARATOR
-            )
-        );
+        $reportFiles = $this->generatedReportFiles();
 
         $expected = json_decode($string->getRaw(), true);
         $actual = json_decode(file_get_contents(sprintf($reportFiles[0])), true);
@@ -188,21 +195,26 @@ class FeatureContext implements Context
     }
 
     /**
+     * @Then there should be :featureCount features in the report :reportName
+     * @Then there should be :featureCount feature in the report :reportName
+     */
+    public function thereShouldBeFeaturesInTheReport(int $featureCount, string $reportName)
+    {
+        $reportFiles = $this->generatedReportFiles($reportName);
+
+        $reportData = json_decode(file_get_contents(sprintf($reportFiles[0])), true);
+        PHPUnit_Framework_Assert::assertCount($featureCount, $reportData);
+    }
+
+    /**
      * @Then :count result file should be generated
      * @Then :count result files should be generated
      */
     public function resultFileShouldBeGenerated(int $count)
     {
-        $reportFiles = glob(
-            sprintf(
-                '%1$s%2$sreports%2$sreport*.json',
-                $this->workingDir,
-                DIRECTORY_SEPARATOR
-            )
-        );
+        $reportFiles = $this->generatedReportFiles();
         PHPUnit_Framework_Assert::assertCount($count, $reportFiles);
     }
-
 
     /**
      * Removes the dynamic parts of a result, like the feature path and durations.
@@ -223,6 +235,18 @@ class FeatureContext implements Context
         return $array;
     }
 
+    private function generatedReportFiles($reportName = 'report*.json'): array
+    {
+        return glob(
+            sprintf(
+                '%1$s%2$sreports%2$s%3$s',
+                $this->workingDir,
+                DIRECTORY_SEPARATOR,
+                $reportName
+            )
+        );
+    }
+
     private function writeBehatConfigForTests(string $dir, array $extraOptions = [])
     {
         // create configuration
@@ -232,8 +256,7 @@ default:
     suites:
         default:
             paths:
-                - "$dir/features"
-                - "~$dir/features/othersuite"
+                - "$dir/features/default"
             contexts:
                 - ExampleFeatureContext
         othersuite:
@@ -243,7 +266,7 @@ default:
                 - ExampleFeatureContext
     extensions:
         Vanare\BehatCucumberJsonFormatter\Extension:
-            fileNamePrefix: report
+            fileNamePrefix: report-
             outputDir: "$reportsDir"
 EOF;
         $content .= implode("", array_map(function ($key, $value) {

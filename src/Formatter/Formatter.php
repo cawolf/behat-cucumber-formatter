@@ -139,7 +139,7 @@ class Formatter implements FormatterInterface
 
         if ($this->resultFilePerSuite) {
             foreach ($this->suites as $suite) {
-                $this->printer->setResultFileName('report-' . $suite->getName());
+                $this->printer->setResultFileName($suite->getFilenameForReport());
                 $suiteResult = $this->renderer->getResultForSuite($suite->getName());
                 $this->printer->write($suiteResult);
             }
@@ -147,13 +147,7 @@ class Formatter implements FormatterInterface
         }
 
         if (!$this->printer->getResultFileName()) {
-            $this->printer->setResultFileName(
-                str_replace(
-                    DIRECTORY_SEPARATOR,
-                    FileOutputPrinter::FILE_SEPARATOR,
-                    $this->currentFeature->getFilenameForReport()
-                )
-            );
+            $this->printer->setResultFileName('all');
         }
 
         $this->printer->write($this->renderer->getResult());

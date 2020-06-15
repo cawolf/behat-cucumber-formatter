@@ -195,14 +195,6 @@ class Feature
     }
 
     /**
-     * @return string
-     */
-    public function getFilenameForReport()
-    {
-        return dirname($this->file) . FileOutputPrinter::FILE_SEPARATOR . basename($this->file, '.feature');
-    }
-
-    /**
      * @return Scenario[]
      */
     public function getScenarios()
