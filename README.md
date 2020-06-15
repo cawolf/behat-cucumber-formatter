@@ -1,4 +1,4 @@
-# Behat Cucumber Json Formatter 
+# Behat Cucumber Json Formatter
 
 *Note*: this is a fork of [Vanare/behat-cucumber-formatter](https://github.com/Vanare/behat-cucumber-formatter). As the original project seems unmaintained and there is no possibility to contact the owner, I publish the library under my handle. Many thanks to the original team of Vanare for starting this great library!
 
@@ -27,6 +27,7 @@ default:
     extensions:
         Vanare\BehatCucumberJsonFormatter\Extension:
             fileNamePrefix: report
+            resultFilePerSuite: true
             outputDir: %paths.base%/build/tests
 ```
 
@@ -41,6 +42,9 @@ bin/behat -f cucumber_json
 - `fileNamePrefix`: Filename prefix of generated report
 - `outputDir`: Generated report will be placed in this directory
 - `fileName` _(optional)_: Filename of generated report - current feature name will be used by default.
+Only applicable when `resultFilePerSuite` is not enabled.
+- `resultFilePerSuite` _(optional)_: The default behaviour is to generate a single report named `all.json`.
+If this option is set to `true`, a report will be created per behat suite.
 
 ## Licence
 
