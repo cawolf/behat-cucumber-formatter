@@ -1,4 +1,5 @@
 .idea
+.php-version
 vendor
 bin
 composer.lock
