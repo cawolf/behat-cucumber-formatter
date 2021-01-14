@@ -111,7 +111,7 @@ class Formatter implements FormatterInterface
     }
 
     /** @inheritdoc */
-    public function getSuites()
+    public function getSuites(): array
     {
         return $this->suites;
     }

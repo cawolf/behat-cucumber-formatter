@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Formatter;
 
 use Behat\Testwork\Output\Formatter as FormatterOutputInterface;
@@ -12,7 +14,7 @@ interface FormatterInterface extends FormatterOutputInterface
      *
      * @return Suite[]
      */
-    public function getSuites();
+    public function getSuites(): array;
 
     /**
      * Set a fixed filename, which will override the current feature filename.
