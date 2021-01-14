@@ -1,63 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Node;
 
 class Suite
 {
     /**
-     * @var mixed
+     * @var string
      */
-    private $name;
+    private $name = '';
 
     /**
-     * @var mixed
+     * @var array
      */
-    private $features;
+    private $features = [];
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFeatures()
+    public function getFeatures(): array
     {
         return $this->features;
     }
 
-    /**
-     * @param mixed $features
-     */
-    public function setFeatures($features)
+    public function setFeatures(array $features): void
     {
         $this->features = $features;
     }
 
     /**
-     * @param $feature
+     * @param mixed $feature
      */
-    public function addFeature($feature)
+    public function addFeature($feature): void
     {
         $this->features[] = $feature;
     }
 
-    /**
-     * @return string
-     */
-    public function getFilenameForReport()
+    public function getFilenameForReport(): string
     {
         return $this->getName();
     }

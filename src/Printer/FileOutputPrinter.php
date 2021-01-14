@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Printer;
 
 use Behat\Testwork\Output\Exception\BadOutputPathException;
@@ -7,8 +9,6 @@ use Behat\Testwork\Output\Printer\OutputPrinter as OutputPrinterInterface;
 
 class FileOutputPrinter implements OutputPrinterInterface
 {
-    const FILE_SEPARATOR = '-';
-
     /**
      * @var string
      */
@@ -24,11 +24,7 @@ class FileOutputPrinter implements OutputPrinterInterface
      */
     private $resultFileName = '';
 
-    /**
-     * @param $fileNamePrefix
-     * @param $path
-     */
-    public function __construct($fileNamePrefix, $path)
+    public function __construct(string $fileNamePrefix, string $path)
     {
         $this->fileNamePrefix = $fileNamePrefix;
         $this->setOutputPath($path);
@@ -39,10 +35,10 @@ class FileOutputPrinter implements OutputPrinterInterface
      *
      * @param string $path
      */
-    public function setOutputPath($path)
+    public function setOutputPath($path): void
     {
         if (!file_exists($path)) {
-            if (!mkdir($path, 0755, true)) {
+            if (!mkdir($path, 0755, true) && !is_dir($path)) {
                 throw new BadOutputPathException(
                     sprintf(
                         'Output path %s does not exist and could not be created!',
@@ -51,77 +47,69 @@ class FileOutputPrinter implements OutputPrinterInterface
                     $path
                 );
             }
-        } else {
-            if (!is_dir($path)) {
-                throw new BadOutputPathException(
-                    sprintf(
-                        'The argument to `output` is expected to the a directory, but got %s!',
-                        $path
-                    ),
+        } else if (!is_dir($path)) {
+            throw new BadOutputPathException(
+                sprintf(
+                    'The argument to `output` is expected to the a directory, but got %s!',
                     $path
-                );
-            }
+                ),
+                $path
+            );
         }
         $this->path = $path;
     }
 
-    /**
-     * @param string $resultFileName
-     */
-    public function setResultFileName($resultFileName)
+    public function setResultFileName(string $resultFileName): void
     {
         $this->resultFileName = $resultFileName;
     }
 
-    /**
-     * @return string
-     */
-    public function getResultFileName()
+    public function getResultFileName(): string
     {
         return $this->resultFileName;
     }
 
     /** @inheritdoc */
-    public function getOutputPath()
+    public function getOutputPath(): ?string
     {
         return $this->path;
     }
 
     /** @inheritdoc */
-    public function setOutputStyles(array $styles)
+    public function setOutputStyles(array $styles): void
     {
     }
 
     /** @inheritdoc */
-    public function getOutputStyles()
+    public function getOutputStyles(): array
     {
         return [];
     }
 
     /** @inheritdoc */
-    public function setOutputDecorated($decorated)
+    public function setOutputDecorated($decorated): void
     {
     }
 
     /** @inheritdoc */
-    public function isOutputDecorated()
+    public function isOutputDecorated(): ?bool
     {
         return null;
     }
 
     /** @inheritdoc */
-    public function setOutputVerbosity($level)
+    public function setOutputVerbosity($level): void
     {
     }
 
     /** @inheritdoc */
-    public function getOutputVerbosity()
+    public function getOutputVerbosity(): int
     {
         return 0;
     }
 
     /** @inheritdoc */
-    public function write($messages, $append = false)
+    public function write($messages, $append = false): void
     {
         $file = $this->getOutputPath() . DIRECTORY_SEPARATOR . $this->fileNamePrefix . $this->resultFileName . '.json';
 
@@ -133,13 +121,13 @@ class FileOutputPrinter implements OutputPrinterInterface
     }
 
     /** @inheritdoc */
-    public function writeln($messages = '')
+    public function writeln($messages = ''): void
     {
         $this->write($messages, true);
     }
 
     /** @inheritdoc */
-    public function flush()
+    public function flush(): void
     {
     }
 }

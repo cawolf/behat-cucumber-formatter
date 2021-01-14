@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter;
 
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
@@ -7,35 +9,24 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Vanare\BehatCucumberJsonFormatter\Formatter\Formatter;
 
 class Extension implements ExtensionInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
     }
 
-    /**
-     * @return string
-     */
-    public function getConfigKey()
+    public function getConfigKey(): string
     {
         return 'cucumber_json';
     }
 
-    /**
-     * @param ExtensionManager $extensionManager
-     */
-    public function initialize(ExtensionManager $extensionManager)
+    public function initialize(ExtensionManager $extensionManager): void
     {
     }
 
-    /**
-     * @param ArrayNodeDefinition $builder
-     */
-    public function configure(ArrayNodeDefinition $builder)
+    public function configure(ArrayNodeDefinition $builder): void
     {
         $builder->children()->scalarNode('fileNamePrefix')->defaultValue('');
         $builder->children()->scalarNode('outputDir')->defaultValue('build/tests');
@@ -43,13 +34,9 @@ class Extension implements ExtensionInterface
         $builder->children()->booleanNode('resultFilePerSuite')->defaultFalse();
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     */
-    public function load(ContainerBuilder $container, array $config)
+    public function load(ContainerBuilder $container, array $config): void
     {
-        $definition = new Definition('Vanare\\BehatCucumberJsonFormatter\\Formatter\\Formatter');
+        $definition = new Definition(Formatter::class);
 
         $definition->addArgument($config['fileNamePrefix']);
         $definition->addArgument($config['outputDir']);

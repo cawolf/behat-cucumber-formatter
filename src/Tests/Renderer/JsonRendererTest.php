@@ -23,9 +23,6 @@ class JsonRendererTest extends TestCase
 
     protected $feature;
 
-    /**
-     * @var FormatterInterface
-     */
     protected $formatter;
 
     public function setUp(): void
@@ -46,7 +43,7 @@ class JsonRendererTest extends TestCase
     {
         $this->feature
             ->method('getScenarios')
-            ->willReturn(null)
+            ->willReturn([])
         ;
 
         $this->generateMockStructure();

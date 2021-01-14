@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Node;
 
+use Behat\Behat\Definition\Definition;
 use Behat\Behat\Tester\Result\StepResult;
 
 class Step
 {
     /**
-     * @var
+     * @var string
      */
     private $name = '';
 
@@ -33,9 +36,9 @@ class Step
     ];
 
     /**
-     * @var mixed
+     * @var string
      */
-    private $keyword;
+    private $keyword = '';
 
     /**
      * @var mixed
@@ -43,12 +46,12 @@ class Step
     private $text;
 
     /**
-     * @var mixed
+     * @var array
      */
-    private $arguments;
+    private $arguments = [];
 
     /**
-     * @var mixed
+     * @var int
      */
     private $line;
 
@@ -63,9 +66,9 @@ class Step
     private $resultCode;
 
     /**
-     * @var mixed
+     * @var string
      */
-    private $exception;
+    private $exception = '';
 
     /**
      * @var mixed
@@ -73,48 +76,31 @@ class Step
     private $output;
 
     /**
-     * @var mixed
+     * @var ?Definition
      */
     private $definition;
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return array
-     */
-    public function getMatch()
+    public function getMatch(): array
     {
         return $this->match;
     }
 
-    /**
-     * @param array $match
-     */
-    public function setMatch($match)
+    public function setMatch(array $match): void
     {
         $this->match = $match;
     }
 
-    /**
-     * Process result.
-     *
-     * @return array
-     */
-    public function getProcessedResult()
+    public function getProcessedResult(): array
     {
         $status = StepResult::SKIPPED;
 
@@ -133,18 +119,12 @@ class Step
         return $result;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getKeyword()
+    public function getKeyword(): string
     {
         return $this->keyword;
     }
 
-    /**
-     * @param mixed $keyword
-     */
-    public function setKeyword($keyword)
+    public function setKeyword(string $keyword): void
     {
         $this->keyword = $keyword;
     }
@@ -160,39 +140,27 @@ class Step
     /**
      * @param mixed $text
      */
-    public function setText($text)
+    public function setText($text): void
     {
         $this->text = $text;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
 
-    /**
-     * @param mixed $arguments
-     */
-    public function setArguments($arguments)
+    public function setArguments(array $arguments): void
     {
         $this->arguments = $arguments;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLine()
+    public function getLine(): int
     {
         return $this->line;
     }
 
-    /**
-     * @param mixed $line
-     */
-    public function setLine($line)
+    public function setLine(int $line): void
     {
         $this->line = $line;
     }
@@ -213,34 +181,22 @@ class Step
         $this->result = $result;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getException()
+    public function getException(): string
     {
         return $this->exception;
     }
 
-    /**
-     * @param mixed $exception
-     */
-    public function setException($exception)
+    public function setException(string $exception): void
     {
         $this->exception = $exception;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDefinition()
+    public function getDefinition(): ?Definition
     {
         return $this->definition;
     }
 
-    /**
-     * @param mixed $definition
-     */
-    public function setDefinition($definition)
+    public function setDefinition(?Definition $definition): void
     {
         $this->definition = $definition;
     }
@@ -277,19 +233,13 @@ class Step
         $this->resultCode = $resultCode;
     }
 
-    /**
-     * @return int
-     */
-    public function getDuration()
+    public function getDuration(): int
     {
         return $this->duration;
     }
 
-    /**
-     * @param int $duration
-     */
-    public function setDuration($duration)
+    public function setDuration($duration): void
     {
-        $this->duration = $duration;
+        $this->duration = (int) $duration;
     }
 }

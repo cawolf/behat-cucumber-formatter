@@ -1,33 +1,28 @@
 <?php
 
-namespace Vanare\BehatCucumberJsonFormatter\Node;
+declare(strict_types=1);
 
-use Vanare\BehatCucumberJsonFormatter\Printer\FileOutputPrinter;
+namespace Vanare\BehatCucumberJsonFormatter\Node;
 
 class Feature
 {
     /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @var string
+     * @var ?string
      */
     private $name;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $description = '';
 
     /**
-     * @var array
+     * @var string[]
      */
     private $tags;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $file;
 
@@ -52,11 +47,6 @@ class Feature
     private $keyword = '';
 
     /**
-     * @var string
-     */
-    private $uri = '';
-
-    /**
      * @var int
      */
     private $line = 0;
@@ -64,132 +54,80 @@ class Feature
     /**
      * @var Scenario[]
      */
-    private $scenarios;
+    private $scenarios = [];
 
-    /**
-     * @return mixed
-     */
-    public function getKeyword()
+    public function getKeyword(): string
     {
         return $this->keyword;
     }
 
-    /**
-     * @param mixed $keyword
-     */
-    public function setKeyword($keyword)
+    public function setKeyword(string $keyword): void
     {
         $this->keyword = $keyword;
     }
 
-    /**
-     * @return int
-     */
-    public function getLine()
+    public function getLine(): int
     {
         return $this->line;
     }
 
-    /**
-     * @param int $line
-     */
-    public function setLine($line)
+    public function setLine(int $line): void
     {
         $this->line = $line;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->getFile();
     }
 
-    /**
-     * @param mixed $uri
-     */
-    public function setUri($uri)
-    {
-        $this->uri = $uri;
-    }
-
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return preg_replace('/\s/', '-', mb_strtolower($this->getName(), 'UTF-8'));
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
+    public function getName(): string
     {
-        $this->id = $id;
+        return $this->name ?? '';
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
-        return $this->description;
+        return $this->description ?? '';
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
 
     /**
-     * @return mixed
+     * @return string[]
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
 
     /**
-     * @param mixed $tags
+     * @param string[] $tags
      */
-    public function setTags($tags)
+    public function setTags(array $tags): void
     {
         $this->tags = $tags;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFile()
+    public function getFile(): string
     {
-        return $this->file;
+        return $this->file ?? '';
     }
 
-    /**
-     * @param mixed $file
-     */
-    public function setFile($file)
+    public function setFile(?string $file): void
     {
         $this->file = $file;
     }
@@ -197,7 +135,7 @@ class Feature
     /**
      * @return Scenario[]
      */
-    public function getScenarios()
+    public function getScenarios(): array
     {
         return $this->scenarios;
     }
@@ -205,71 +143,50 @@ class Feature
     /**
      * @param Scenario[] $scenarios
      */
-    public function setScenarios($scenarios)
+    public function setScenarios(array $scenarios): void
     {
         $this->scenarios = $scenarios;
     }
 
-    /**
-     * @param $scenario Scenario
-     */
-    public function addScenario($scenario)
+    public function addScenario(Scenario $scenario): void
     {
-        $scenario->setId($this->scenarioCounter);
+        # FIXME $scenario->setId($this->scenarioCounter);
         $this->scenarioCounter++;
         $this->scenarios[] = $scenario;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFailedScenarios()
+    public function getFailedScenarios(): int
     {
         return $this->failedScenarios;
     }
 
-    /**
-     * @param mixed $failedScenarios
-     */
-    public function setFailedScenarios($failedScenarios)
+    public function setFailedScenarios(int $failedScenarios): void
     {
         $this->failedScenarios = $failedScenarios;
     }
 
-    public function addFailedScenario()
+    public function addFailedScenario(): void
     {
         $this->failedScenarios++;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPassedScenarios()
+    public function getPassedScenarios(): int
     {
         return $this->passedScenarios;
     }
 
-    /**
-     * @param mixed $passedScenarios
-     */
-    public function setPassedScenarios($passedScenarios)
+    public function setPassedScenarios(int $passedScenarios): void
     {
         $this->passedScenarios = $passedScenarios;
     }
 
-    public function addPassedScenario()
+    public function addPassedScenario(): void
     {
         $this->passedScenarios++;
     }
 
-    /**
-     * @return bool
-     */
-    public function allPassed()
+    public function allPassed(): bool
     {
-        if ($this->failedScenarios == 0) {
-            return true;
-        }
-        return false;
+        return $this->failedScenarios === 0;
     }
 }

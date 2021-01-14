@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Node;
 
 class Scenario
 {
-
     /**
      * @var Feature
      */
@@ -31,11 +32,6 @@ class Scenario
     private $examples = [];
 
     /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var mixed
      */
     private $name;
@@ -46,7 +42,7 @@ class Scenario
     private $line;
 
     /**
-     * @var mixed
+     * @var array
      */
     private $tags;
 
@@ -65,50 +61,32 @@ class Scenario
      */
     private $steps;
 
-    /**
-     * @return string
-     */
-    public function getKeyword()
+    public function getKeyword(): string
     {
         return $this->keyword;
     }
 
-    /**
-     * @param string $keyword
-     */
-    public function setKeyword($keyword)
+    public function setKeyword(string $keyword): void
     {
         $this->keyword = $keyword;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return mb_strtolower($this->type, 'UTF-8');
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type)
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
@@ -116,7 +94,7 @@ class Scenario
     /**
      * @return Example[]
      */
-    public function getExamples()
+    public function getExamples(): array
     {
         return $this->examples;
     }
@@ -124,31 +102,22 @@ class Scenario
     /**
      * @param Example[] $examples
      */
-    public function setExamples($examples)
+    public function setExamples(array $examples): void
     {
         $this->examples = $examples;
     }
 
-    /**
-     * @return Feature
-     */
-    public function getFeature()
+    public function getFeature(): Feature
     {
         return $this->feature;
     }
 
-    /**
-     * @param Feature $feature
-     */
-    public function setFeature($feature)
+    public function setFeature(Feature $feature): void
     {
         $this->feature = $feature;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return sprintf(
             '%s;%s%s',
@@ -156,14 +125,6 @@ class Scenario
             preg_replace('/\s/', '-', mb_strtolower($this->getName(), 'UTF-8')),
             $this->getType() === 'scenario_outline' ? '---' . $this->getLine() : ''
         );
-    }
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -177,71 +138,47 @@ class Scenario
     /**
      * @param mixed $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return int
-     */
-    public function getLoopCount()
+    public function getLoopCount(): int
     {
         return $this->loopCount;
     }
 
-    /**
-     * @param int $loopCount
-     */
-    public function setLoopCount($loopCount)
+    public function setLoopCount(int $loopCount): void
     {
         $this->loopCount = $loopCount;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLine()
+    public function getLine(): int
     {
         return $this->line;
     }
 
-    /**
-     * @param mixed $line
-     */
-    public function setLine($line)
+    public function setLine(int $line): void
     {
         $this->line = $line;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
 
-    /**
-     * @param mixed $tags
-     */
-    public function setTags($tags)
+    public function setTags(array $tags): void
     {
         $this->tags = $tags;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isPassed()
+    public function isPassed(): bool
     {
         return $this->passed;
     }
 
-    /**
-     * @param boolean $passed
-     */
-    public function setPassed($passed)
+    public function setPassed(bool $passed): void
     {
         $this->passed = $passed;
     }
@@ -249,7 +186,7 @@ class Scenario
     /**
      * @return Step[]
      */
-    public function getSteps()
+    public function getSteps(): array
     {
         return $this->steps;
     }
@@ -257,15 +194,12 @@ class Scenario
     /**
      * @param Step[] $steps
      */
-    public function setSteps($steps)
+    public function setSteps(array $steps): void
     {
         $this->steps = $steps;
     }
 
-    /**
-     * @param Step $step
-     */
-    public function addStep($step)
+    public function addStep(Step $step): void
     {
         $this->steps[] = $step;
     }
@@ -275,6 +209,6 @@ class Scenario
      */
     public function getLoopSize()
     {
-        return $this->loopCount > 0 ? sizeof($this->steps)/$this->loopCount : sizeof($this->steps);
+        return $this->loopCount > 0 ? count($this->steps) / $this->loopCount : count($this->steps);
     }
 }

@@ -18,8 +18,6 @@ interface FormatterInterface extends FormatterOutputInterface
 
     /**
      * Set a fixed filename, which will override the current feature filename.
-     *
-     * @param $fileName
      */
-    public function setFileName($fileName);
+    public function setFileName(string $fileName);
 }

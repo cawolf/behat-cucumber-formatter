@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Renderer;
 
 use Vanare\BehatCucumberJsonFormatter\Formatter\FormatterInterface;
@@ -17,16 +19,13 @@ class JsonRenderer implements RendererInterface
      */
     protected $result = [];
 
-    /**
-     * @param FormatterInterface $formatter
-     */
     public function __construct(FormatterInterface $formatter)
     {
         $this->formatter = $formatter;
     }
 
     /** @inheritdoc */
-    public function render()
+    public function render(): void
     {
         $suites = $this->formatter->getSuites();
 
@@ -38,7 +37,7 @@ class JsonRenderer implements RendererInterface
     }
 
     /** @inheritdoc */
-    public function getResult($asString = true)
+    public function getResult(bool $asString = true)
     {
         if ($asString) {
             $mergedResults = [];
@@ -51,12 +50,9 @@ class JsonRenderer implements RendererInterface
         return $this->result;
     }
 
-    public function getResultForSuite($suiteName, $asString = true)
+    public function getResultForSuite(string $suiteName, bool $asString = true)
     {
-        $result = null;
-        if (isset($this->result[$suiteName])) {
-            $result = $this->result[$suiteName];
-        }
+        $result = $this->result[$suiteName] ?? null;
 
         if ($asString) {
             return json_encode($result);
@@ -66,10 +62,8 @@ class JsonRenderer implements RendererInterface
 
     /**
      * @param Node\Suite $suite
-     *
-     * @return array
      */
-    protected function processSuite(Node\Suite $suite)
+    protected function processSuite(Node\Suite $suite): array
     {
         $currentSuite = [];
 
@@ -84,10 +78,8 @@ class JsonRenderer implements RendererInterface
 
     /**
      * @param Node\Feature $feature
-     *
-     * @return array
      */
-    protected function processFeature(Node\Feature $feature)
+    protected function processFeature(Node\Feature $feature): array
     {
         $currentFeature = [
             'uri' => $feature->getUri(),
@@ -114,10 +106,8 @@ class JsonRenderer implements RendererInterface
 
     /**
      * @param Node\Scenario $scenario
-     *
-     * @return array
      */
-    protected function processScenario(Node\Scenario $scenario)
+    protected function processScenario(Node\Scenario $scenario): array
     {
         $currentScenario = [
             'id' => $scenario->getId(),
@@ -151,28 +141,22 @@ class JsonRenderer implements RendererInterface
 
     /**
      * @param Node\Step $step
-     *
-     * @return array
      */
-    protected function processStep(Node\Step $step)
+    protected function processStep(Node\Step $step): array
     {
-        $result = [
+        return [
             'keyword' => $step->getKeyword(),
             'name' => $step->getName(),
             'line' => $step->getLine(),
             'match' => $step->getMatch(),
             'result' => $step->getProcessedResult(),
         ];
-
-        return $result;
     }
 
     /**
      * @param Node\Example $example
-     *
-     * @return array
      */
-    protected function processExample(Node\Example $example)
+    protected function processExample(Node\Example $example): array
     {
         $currentExample = [
             'keyword' => $example->getKeyword(),
@@ -194,10 +178,8 @@ class JsonRenderer implements RendererInterface
 
     /**
      * @param Node\ExampleRow $exampleRow
-     *
-     * @return array
      */
-    protected function processExampleRow(Node\ExampleRow $exampleRow)
+    protected function processExampleRow(Node\ExampleRow $exampleRow): array
     {
         return [
             'cells' => $exampleRow->getCells(),
@@ -206,11 +188,7 @@ class JsonRenderer implements RendererInterface
         ];
     }
 
-    /**
-     * @param array $tags
-     * @return array
-     */
-    protected function processTags(array $tags)
+    protected function processTags(array $tags): array
     {
         $result = [];
 

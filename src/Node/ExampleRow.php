@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Node;
 
 class ExampleRow
@@ -19,50 +21,32 @@ class ExampleRow
      */
     private $id = '';
 
-    /**
-     * @return array
-     */
-    public function getCells()
+    public function getCells(): array
     {
         return $this->cells;
     }
 
-    /**
-     * @param array $cells
-     */
-    public function setCells($cells)
+    public function setCells(array $cells): void
     {
         $this->cells = $cells;
     }
 
-    /**
-     * @return int
-     */
-    public function getLine()
+    public function getLine(): int
     {
         return $this->line;
     }
 
-    /**
-     * @param int $line
-     */
-    public function setLine($line)
+    public function setLine(int $line): void
     {
         $this->line = $line;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }

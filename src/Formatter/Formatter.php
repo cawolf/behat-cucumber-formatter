@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Formatter;
 
 use Behat\Behat\EventDispatcher\Event as BehatEvent;
@@ -22,7 +24,7 @@ class Formatter implements FormatterInterface
     /** @var Timer */
     private $timer;
 
-    /** @var OutputPrinter */
+    /** @var FileOutputPrinter */
     private $printer;
 
     /** @var RendererInterface */
@@ -46,11 +48,7 @@ class Formatter implements FormatterInterface
     /** @var bool */
     private $resultFilePerSuite = false;
 
-    /**
-     * @param string $fileNamePrefix
-     * @param string $outputDir
-     */
-    public function __construct($fileNamePrefix, $outputDir)
+    public function __construct(string $fileNamePrefix, string $outputDir)
     {
         $this->renderer = new JsonRenderer($this);
         $this->printer = new FileOutputPrinter($fileNamePrefix, $outputDir);
@@ -58,7 +56,7 @@ class Formatter implements FormatterInterface
     }
 
     /** @inheritdoc */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TestworkEvent\ExerciseCompleted::BEFORE => 'onBeforeExercise',
@@ -77,29 +75,31 @@ class Formatter implements FormatterInterface
     }
 
     /** @inheritdoc */
-    public function setFileName($fileName) {
+    public function setFileName($fileName): void
+    {
         $this->printer->setResultFileName($fileName);
     }
 
     /** @inheritdoc */
-    public function setResultFilePerSuite(bool $enabled) {
+    public function setResultFilePerSuite(bool $enabled): void
+    {
         $this->resultFilePerSuite = $enabled;
     }
 
     /** @inheritdoc */
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Cucumber style formatter';
     }
 
     /** @inheritdoc */
-    public function getOutputPrinter()
+    public function getOutputPrinter(): OutputPrinter
     {
         return $this->printer;
     }
 
     /** @inheritdoc */
-    public function setParameter($name, $value)
+    public function setParameter($name, $value): void
     {
         $this->parameters[$name] = $value;
     }
@@ -118,20 +118,16 @@ class Formatter implements FormatterInterface
 
     /**
      * Triggers before running tests.
-     *
-     * @param TestworkEvent\BeforeExerciseCompleted $event
      */
-    public function onBeforeExercise(TestworkEvent\BeforeExerciseCompleted $event)
+    public function onBeforeExercise(TestworkEvent\BeforeExerciseCompleted $event): void
     {
         $this->timer->start();
     }
 
     /**
      * Triggers after running tests.
-     *
-     * @param TestworkEvent\ExerciseCompleted $event
      */
-    public function onAfterExercise(TestworkEvent\ExerciseCompleted $event)
+    public function onAfterExercise(TestworkEvent\ExerciseCompleted $event): void
     {
         $this->timer->stop();
 
@@ -156,7 +152,7 @@ class Formatter implements FormatterInterface
     /**
      * @param TestworkEvent\BeforeSuiteTested $event
      */
-    public function onBeforeSuiteTested(TestworkEvent\BeforeSuiteTested $event)
+    public function onBeforeSuiteTested(TestworkEvent\BeforeSuiteTested $event): void
     {
         $this->currentSuite = new Node\Suite();
         $this->currentSuite->setName($event->getSuite()->getName());
@@ -165,7 +161,7 @@ class Formatter implements FormatterInterface
     /**
      * @param TestworkEvent\SuiteTested $event
      */
-    public function onAfterSuiteTested(TestworkEvent\SuiteTested $event)
+    public function onAfterSuiteTested(TestworkEvent\SuiteTested $event): void
     {
         $this->suites[] = $this->currentSuite;
     }
@@ -173,10 +169,10 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\BeforeFeatureTested $event
      */
-    public function onBeforeFeatureTested(BehatEvent\BeforeFeatureTested $event)
+    public function onBeforeFeatureTested(BehatEvent\BeforeFeatureTested $event): void
     {
         $feature = new Node\Feature();
-        $feature->setId($this->featureCounter);
+        # FIXME $feature->setId($this->featureCounter);
         ++$this->featureCounter;
         $feature->setName($event->getFeature()->getTitle());
         $feature->setDescription($event->getFeature()->getDescription());
@@ -190,7 +186,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\AfterFeatureTested $event
      */
-    public function onAfterFeatureTested(BehatEvent\AfterFeatureTested $event)
+    public function onAfterFeatureTested(BehatEvent\AfterFeatureTested $event): void
     {
         $this->currentSuite->addFeature($this->currentFeature);
     }
@@ -198,7 +194,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\BeforeScenarioTested $event
      */
-    public function onBeforeScenarioTested(BehatEvent\BeforeScenarioTested $event)
+    public function onBeforeScenarioTested(BehatEvent\BeforeScenarioTested $event): void
     {
         $fullTitle = explode("\n", $event->getScenario()->getTitle());
         if (count($fullTitle) > 1) {
@@ -222,7 +218,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\AfterScenarioTested $event
      */
-    public function onAfterScenarioTested(BehatEvent\AfterScenarioTested $event)
+    public function onAfterScenarioTested(BehatEvent\AfterScenarioTested $event): void
     {
         $scenarioPassed = $event->getTestResult()->isPassed();
 
@@ -239,7 +235,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\BeforeOutlineTested $event
      */
-    public function onBeforeOutlineTested(BehatEvent\BeforeOutlineTested $event)
+    public function onBeforeOutlineTested(BehatEvent\BeforeOutlineTested $event): void
     {
         $scenario = new Node\Scenario();
         $scenario->setName($event->getOutline()->getTitle());
@@ -254,7 +250,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\AfterOutlineTested $event
      */
-    public function onAfterOutlineTested(BehatEvent\AfterOutlineTested $event)
+    public function onAfterOutlineTested(BehatEvent\AfterOutlineTested $event): void
     {
         /** @var TestResults $testResults */
         $testResults = $event->getTestResult();
@@ -286,7 +282,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\BeforeStepTested $event
      */
-    public function onBeforeStepTested(BehatEvent\BeforeStepTested $event)
+    public function onBeforeStepTested(BehatEvent\BeforeStepTested $event): void
     {
         $this->timer->start();
     }
@@ -294,7 +290,7 @@ class Formatter implements FormatterInterface
     /**
      * @param BehatEvent\AfterStepTested $event
      */
-    public function onAfterStepTested(BehatEvent\AfterStepTested $event)
+    public function onAfterStepTested(BehatEvent\AfterStepTested $event): void
     {
         $this->timer->stop();
 
@@ -334,7 +330,7 @@ class Formatter implements FormatterInterface
     }
 
     /** @inheritdoc */
-    public function getName()
+    public function getName(): string
     {
         return 'cucumber_json';
     }
@@ -343,7 +339,7 @@ class Formatter implements FormatterInterface
      * @param Node\Step  $step
      * @param TestResult $result
      */
-    protected function processStep(Node\Step $step, TestResult $result)
+    protected function processStep(Node\Step $step, TestResult $result): void
     {
         // Pended
         if (is_a($result, Result\UndefinedStepResult::class)) {
