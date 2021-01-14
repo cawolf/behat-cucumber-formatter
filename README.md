@@ -1,3 +1,7 @@
+![release](https://github.com/cawolf/behat-cucumber-formatter/workflows/release/badge.svg)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/cawolf/behat-cucumber-formatter)
+![GitHub](https://img.shields.io/github/license/cawolf/behat-cucumber-formatter)
+
 # Behat Cucumber Json Formatter
 
 *Note*: this is a fork of [Vanare/behat-cucumber-formatter](https://github.com/Vanare/behat-cucumber-formatter). As the original project seems unmaintained and there is no possibility to contact the owner, I publish the library under my handle. Many thanks to the original team of Vanare for starting this great library!
@@ -6,7 +10,7 @@ This is Behat extension for generating json reports for [Cucumber Test Result Pl
 
 ## Requirements
 
-- PHP 7.2 or higher
+- PHP 7.3 or higher
 
 - Behat 3.x
 
