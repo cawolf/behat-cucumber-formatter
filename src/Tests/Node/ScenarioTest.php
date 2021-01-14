@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Vanare\BehatCucumberJsonFormatter\Tests\Node;
 
-
+use PHPUnit\Framework\TestCase;
 use Vanare\BehatCucumberJsonFormatter\Node;
 
-class ScenarioTest extends \PHPUnit_Framework_TestCase
+class ScenarioTest extends TestCase
 {
 
-    const FEATURE_ID = 'test-feature';
+    private const FEATURE_ID = 'test-feature';
 
     /**
      * @test
      */
-    public function getId()
+    public function getId(): void
     {
         $name = 'This is a test name, test name for awesome feature';
         $expectedId = sprintf('%s;this-is-a-test-name,-test-name-for-awesome-feature', static::FEATURE_ID);
@@ -22,13 +23,10 @@ class ScenarioTest extends \PHPUnit_Framework_TestCase
         $scenario = $this->createScenario();
         $scenario->setName($name);
 
-        $this->assertEquals($expectedId, $scenario->getId());
+        static::assertEquals($expectedId, $scenario->getId());
     }
 
-    /**
-     * @return Node\Scenario
-     */
-    protected function createScenario()
+    protected function createScenario(): Node\Scenario
     {
 
         $feature = $this
@@ -36,9 +34,8 @@ class ScenarioTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $feature
-            ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(static::FEATURE_ID));
+            ->willReturn(static::FEATURE_ID);
 
         $scenario = new Node\Scenario();
         $scenario->setFeature($feature);

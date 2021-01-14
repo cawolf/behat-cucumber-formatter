@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Vanare\BehatCucumberJsonFormatter\Node;
 
-class FeatureTest extends \PHPUnit_Framework_TestCase
+class FeatureTest extends TestCase
 {
     /**
      * @test
      */
-    public function getId()
+    public function getId(): void
     {
         $name = 'This is a test name, test name for awesome feature';
         $expectedId = 'this-is-a-test-name,-test-name-for-awesome-feature';
@@ -23,7 +26,7 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getUri()
+    public function getUri(): void
     {
         $file = 'features/one_passing_one_failing.feature';
 
@@ -33,10 +36,7 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
         self::assertEquals($file, $feature->getUri());
     }
 
-    /**
-     * @return Node\Feature
-     */
-    protected function createFeature()
+    protected function createFeature(): Node\Feature
     {
         return new Node\Feature();
     }

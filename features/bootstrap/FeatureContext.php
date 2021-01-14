@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * Defines application features from the specific context.
@@ -11,7 +16,7 @@ class FeatureContext implements Context
     /** @var string */
     private $phpBin;
 
-    /** @var \Symfony\Component\Process\Process */
+    /** @var Process */
     private $process;
 
     /** @var string */
@@ -29,7 +34,7 @@ class FeatureContext implements Context
      * @BeforeSuite
      * @AfterSuite
      */
-    public static function cleanTestFolders()
+    public static function cleanTestFolders(): void
     {
         if (is_dir($dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'behat')) {
             self::clearDirectory($dir);
@@ -38,10 +43,8 @@ class FeatureContext implements Context
 
     /**
      * Clears a complete directory by path.
-     *
-     * @param string $path
      */
-    private static function clearDirectory($path)
+    private static function clearDirectory(string $path): void
     {
         $files = scandir($path);
         array_shift($files);
@@ -61,25 +64,32 @@ class FeatureContext implements Context
      * Prepares test folders in the temporary directory.
      *
      * @BeforeScenario
+     * @throws Exception
      */
-    public function prepareTestFolders()
+    public function prepareTestFolders(): void
     {
         $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'behat' . DIRECTORY_SEPARATOR .
-            md5(microtime() . rand(0, 10000));
+            md5(microtime() . random_int(0, 10000));
         $this->reportsDir = $dir . DIRECTORY_SEPARATOR . 'reports';
 
         // create directories
-        mkdir(
-            sprintf(
-                '%1$s%2$sfeatures%2$sbootstrap%2$si18n',
-                $dir,
-                DIRECTORY_SEPARATOR
-            ),
-            0777,
-            true
-        );
-        mkdir($dir . DIRECTORY_SEPARATOR . 'junit');
-        mkdir($this->reportsDir);
+        if (!mkdir(
+                $concurrentDirectory = sprintf(
+                    '%1$s%2$sfeatures%2$sbootstrap%2$si18n',
+                    $dir,
+                    DIRECTORY_SEPARATOR
+                ),
+                0777,
+                true
+            ) && !is_dir($concurrentDirectory)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
+        if (!mkdir($concurrentDirectory = $dir . DIRECTORY_SEPARATOR . 'junit') && !is_dir($concurrentDirectory)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
+        if (!mkdir($concurrentDirectory = $this->reportsDir) && !is_dir($concurrentDirectory)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
 
         $this->writeBehatConfigForTests($dir);
 
@@ -97,13 +107,13 @@ class FeatureContext implements Context
         );
 
         // setup variables
-        $phpFinder = new \Symfony\Component\Process\PhpExecutableFinder();
+        $phpFinder = new PhpExecutableFinder();
         if (false === $php = $phpFinder->find()) {
-            throw new \RuntimeException('Unable to find the PHP executable.');
+            throw new RuntimeException('Unable to find the PHP executable.');
         }
         $this->workingDir = $dir;
         $this->phpBin = $php;
-        $this->process = new Symfony\Component\Process\Process(null);
+        $this->process = new Process(null);
         $this->process->setTimeout(20);
     }
 
@@ -111,7 +121,7 @@ class FeatureContext implements Context
      * @Given I have the following feature:
      * @param PyStringNode $string
      */
-    public function iHaveTheFollowingFeature(PyStringNode $string)
+    public function iHaveTheFollowingFeature(PyStringNode $string): void
     {
         $this->iHaveTheFollowingFeatureFileStoredIn('feature.feature', 'default', $string);
     }
@@ -119,11 +129,15 @@ class FeatureContext implements Context
     /**
      * @Given I have the following feature file :fileName stored in :subDirectory:
      */
-    public function iHaveTheFollowingFeatureFileStoredIn($fileName, $subDirectory = '', PyStringNode $string)
+    public function iHaveTheFollowingFeatureFileStoredIn(string $fileName, string $subDirectory, PyStringNode $string): void
     {
         $filePath = $this->workingDir . '/features' . (!empty($subDirectory) ? '/' . $subDirectory : '') . '/' . $fileName;
-        if (!empty($subDirectory) && !file_exists($subDirectory)) {
-            mkdir(dirname($filePath), 0777, true);
+        if (!empty($subDirectory) && !file_exists($subDirectory) && !mkdir(
+                $concurrentDirectory = dirname($filePath),
+                0777,
+                true
+            ) && !is_dir($concurrentDirectory)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
         file_put_contents($filePath, $string->getRaw());
     }
@@ -131,7 +145,7 @@ class FeatureContext implements Context
     /**
      * @Given I have the enabled the "resultFilePerSuite" option
      */
-    public function iHaveTheEnabledTheResultFilePerSuiteOption()
+    public function iHaveTheEnabledTheResultFilePerSuiteOption(): void
     {
         // manipulate the behat config
         $this->resultFilePerSuiteEnabled = true;
@@ -143,7 +157,7 @@ class FeatureContext implements Context
     /**
      * @When I run behat with the converter and no specific suite is specified
      */
-    public function iRunBehatWithTheConverterAndNoSpecificSuiteIsSpecified()
+    public function iRunBehatWithTheConverterAndNoSpecificSuiteIsSpecified(): void
     {
         $this->runBehatWithConverter();
     }
@@ -151,12 +165,12 @@ class FeatureContext implements Context
     /**
      * @When I run behat with the converter
      */
-    public function iRunBehatWithTheConverter()
+    public function iRunBehatWithTheConverter(): void
     {
         $this->runBehatWithConverter('-s default');
     }
 
-    protected function runBehatWithConverter($extraParameters = '')
+    protected function runBehatWithConverter(string $extraParameters = null): void
     {
         $this->process->setWorkingDirectory($this->workingDir);
         $this->process->setCommandLine(
@@ -180,15 +194,16 @@ class FeatureContext implements Context
     /**
      * @Then the result file will be:
      * @param PyStringNode $string
+     * @throws JsonException
      */
-    public function theResultFileWillBe(PyStringNode $string)
+    public function theResultFileWillBe(PyStringNode $string): void
     {
         $reportFiles = $this->generatedReportFiles();
 
-        $expected = json_decode($string->getRaw(), true);
-        $actual = json_decode(file_get_contents(sprintf($reportFiles[0])), true);
+        $expected = json_decode($string->getRaw(), true, 512, JSON_THROW_ON_ERROR);
+        $actual = json_decode(file_get_contents(sprintf($reportFiles[0])), true, 512, JSON_THROW_ON_ERROR);
 
-        PHPUnit_Framework_Assert::assertEquals(
+        Assert::assertEquals(
             self::removeDynamics($expected),
             self::removeDynamics($actual)
         );
@@ -197,32 +212,30 @@ class FeatureContext implements Context
     /**
      * @Then there should be :featureCount features in the report :reportName
      * @Then there should be :featureCount feature in the report :reportName
+     * @throws JsonException
      */
-    public function thereShouldBeFeaturesInTheReport(int $featureCount, string $reportName)
+    public function thereShouldBeFeaturesInTheReport(int $featureCount, string $reportName): void
     {
         $reportFiles = $this->generatedReportFiles($reportName);
 
-        $reportData = json_decode(file_get_contents(sprintf($reportFiles[0])), true);
-        PHPUnit_Framework_Assert::assertCount($featureCount, $reportData);
+        $reportData = json_decode(file_get_contents(sprintf($reportFiles[0])), true, 512, JSON_THROW_ON_ERROR);
+        Assert::assertCount($featureCount, $reportData);
     }
 
     /**
      * @Then :count result file should be generated
      * @Then :count result files should be generated
      */
-    public function resultFileShouldBeGenerated(int $count)
+    public function resultFileShouldBeGenerated(int $count): void
     {
         $reportFiles = $this->generatedReportFiles();
-        PHPUnit_Framework_Assert::assertCount($count, $reportFiles);
+        Assert::assertCount($count, $reportFiles);
     }
 
     /**
      * Removes the dynamic parts of a result, like the feature path and durations.
-     *
-     * @param array $array
-     * @return array
      */
-    private static function removeDynamics(array $array)
+    private static function removeDynamics(array $array): array
     {
         foreach ($array as &$feature) {
             $feature['uri'] = 'features/features.feature';
@@ -247,7 +260,7 @@ class FeatureContext implements Context
         );
     }
 
-    private function writeBehatConfigForTests(string $dir, array $extraOptions = [])
+    private function writeBehatConfigForTests(string $dir, array $extraOptions = []): void
     {
         // create configuration
         $reportsDir = $this->reportsDir;

@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Tests\Printer;
 
+use Behat\Testwork\Output\Exception\BadOutputPathException;
+use PHPUnit\Framework\TestCase;
 use Vanare\BehatCucumberJsonFormatter\Printer\FileOutputPrinter;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
 
-class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
+class FileOutputPrinterTest extends TestCase
 {
     /**
      * @var vfsStreamDirectory
      */
     protected $validRoot;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->validRoot = vfsStream::setup('root', 0775);
     }
@@ -22,7 +26,7 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function setOutputPathExisted()
+    public function setOutputPathExisted(): void
     {
         $path = $this->validRoot->url();
 
@@ -34,7 +38,7 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function setOutputPathNotExisted()
+    public function setOutputPathNotExisted(): void
     {
         $path = $this->validRoot->url().'/build_666';
 
@@ -46,36 +50,36 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     *
-     * @expectedException \Behat\Testwork\Output\Exception\BadOutputPathException
      */
-    public function setOutputPathShouldRaiseExceptionIfPathCanNotBeCreated()
+    public function setOutputPathShouldRaiseExceptionIfPathCanNotBeCreated(): void
     {
         vfsStream::newDirectory('secured_folder', 0000)->at($this->validRoot);
 
         $path = $this->validRoot->getChild('secured_folder')->url().'/build_666';
 
+        $this->expectException(BadOutputPathException::class);
+
         $this->createPrinter($path);
     }
 
     /**
      * @test
-     *
-     * @expectedException \Behat\Testwork\Output\Exception\BadOutputPathException
      */
-    public function setOutputPathShouldRaiseExceptionIfPathIsNotADirectory()
+    public function setOutputPathShouldRaiseExceptionIfPathIsNotADirectory(): void
     {
         vfsStream::newFile('file.exe', 0755)->at($this->validRoot);
 
         $path = $this->validRoot->getChild('file.exe')->url();
 
+        $this->expectException(BadOutputPathException::class);
+
         $this->createPrinter($path);
     }
 
     /**
      * @test
      */
-    public function write()
+    public function write(): void
     {
         $messages = 'Messages will be here';
 
@@ -93,7 +97,7 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function setResultFileNameAndWriteLn()
+    public function setResultFileNameAndWriteLn(): void
     {
         $messages = 'Messages will be here';
 
@@ -112,7 +116,7 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function inheritedUnusedInterface()
+    public function inheritedUnusedInterface(): void
     {
         $printer = $this->createPrinter($this->validRoot->url());
         $printer->setOutputStyles([]);
@@ -124,12 +128,7 @@ class FileOutputPrinterTest extends \PHPUnit_Framework_TestCase
         $printer->flush();
     }
 
-    /**
-     * @param $path
-     *
-     * @return FileOutputPrinter
-     */
-    protected function createPrinter($path)
+    protected function createPrinter($path): FileOutputPrinter
     {
         return new FileOutputPrinter('testprefix', $path);
     }

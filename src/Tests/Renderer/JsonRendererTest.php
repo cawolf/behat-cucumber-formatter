@@ -1,50 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Tests\Renderer;
 
+use PHPUnit\Framework\TestCase;
 use Vanare\BehatCucumberJsonFormatter\Node;
 use Vanare\BehatCucumberJsonFormatter\Renderer\JsonRenderer;
 use Vanare\BehatCucumberJsonFormatter\Formatter\FormatterInterface;
 
-class JsonRendererTest extends \PHPUnit_Framework_TestCase
+class JsonRendererTest extends TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $exampleRow;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $example;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $step;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $scenario;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $suite;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $feature;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormatterInterface
+     * @var FormatterInterface
      */
     protected $formatter;
 
-    /** @inheritdoc */
-    public function setUp()
+    public function setUp(): void
     {
         $this->step = $this->getMockBuilder(Node\Step::class)->getMock();
         $this->example = $this->getMockBuilder(Node\Example::class)->getMock();
@@ -58,24 +42,24 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function renderShouldNotFailsIfWeGaveEmptyScenariosList()
+    public function renderShouldNotFailsIfWeGaveEmptyScenariosList(): void
     {
         $this->feature
-            ->expects(self::any())
             ->method('getScenarios')
-            ->will(self::returnValue(null))
+            ->willReturn(null)
         ;
 
         $this->generateMockStructure();
 
         $renderer = $this->createRenderer();
         $renderer->render();
+        self::assertNotEmpty($renderer->getResult(false));
     }
 
     /**
      * @test
      */
-    public function renderShouldGenerateValidStructure()
+    public function renderShouldGenerateValidStructure(): void
     {
         $this->generateMockStructure();
 
@@ -83,8 +67,8 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
         $renderer->render();
         $result = $renderer->getResult(false);
 
-        self::assertTrue(is_array($result));
-        self::assertEquals(1, count($result));
+        self::assertIsArray($result);
+        self::assertCount(1, $result);
 
         /*
          * Run through structure
@@ -92,26 +76,26 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
 
         // Suite
         $suite = array_pop($result);
-        self::assertTrue(is_array($suite));
-        self::assertEquals(2, count($suite));
+        self::assertIsArray($suite);
+        self::assertCount(2, $suite);
 
         // Feature
         $feature = array_pop($suite);
         $keys = ['uri', 'id', 'keyword', 'name', 'line', 'description', 'elements', 'tags'];
         self::assertArrayHasKeys($keys, $feature);
-        self::assertTrue(is_array($feature['elements']));
-        self::assertEquals(2, count($feature['elements']));
-        self::assertEquals(2, count($feature['tags']));
+        self::assertIsArray($feature['elements']);
+        self::assertCount(2, $feature['elements']);
+        self::assertCount(2, $feature['tags']);
 
         // Scenario
         $scenario = array_pop($feature['elements']);
         $keys = ['id', 'keyword', 'name', 'line', 'description', 'type', 'steps', 'tags'];
         self::assertArrayHasKeys($keys, $scenario);
-        self::assertTrue(is_array($scenario['steps']));
-        self::assertTrue(is_array($scenario['examples']));
-        self::assertEquals(3, count($scenario['steps']));
-        self::assertEquals(2, count($scenario['examples']));
-        self::assertEquals(2, count($scenario['tags']));
+        self::assertIsArray($scenario['steps']);
+        self::assertIsArray($scenario['examples']);
+        self::assertCount(3, $scenario['steps']);
+        self::assertCount(2, $scenario['examples']);
+        self::assertCount(2, $scenario['tags']);
 
         // Step
         $step = array_pop($scenario['steps']);
@@ -122,8 +106,8 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
         $example = array_pop($scenario['examples']);
         $keys = ['keyword', 'name', 'line', 'description', 'id', 'rows'];
         self::assertArrayHasKeys($keys, $example);
-        self::assertTrue(is_array($example['rows']));
-        self::assertEquals(2, count($example['rows']));
+        self::assertIsArray($example['rows']);
+        self::assertCount(2, $example['rows']);
 
         // ExampleRow
         $row = array_pop($example['rows']);
@@ -134,7 +118,7 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getResultShouldReturnValidJsonString()
+    public function getResultShouldReturnValidJsonString(): void
     {
         $this->generateMockStructure();
 
@@ -144,93 +128,66 @@ class JsonRendererTest extends \PHPUnit_Framework_TestCase
         self::assertJson($renderer->getResult());
     }
 
-    /**
-     * @return JsonRenderer
-     */
-    protected function createRenderer()
+    protected function createRenderer(): JsonRenderer
     {
         return new JsonRenderer($this->formatter);
     }
 
-    /**
-     *
-     */
-    protected function generateMockStructure()
+    protected function generateMockStructure(): void
     {
         $this->example
-            ->expects(self::any())
             ->method('getRows')
-            ->will(self::returnValue([
-                $this->exampleRow,
-                $this->exampleRow,
-            ]));
+            ->willReturn(
+                [$this->exampleRow, $this->exampleRow,]
+            );
 
         $this->scenario
-            ->expects(self::any())
             ->method('getSteps')
-            ->will(self::returnValue([
-                $this->step,
-                $this->step,
-                $this->step,
-            ]));
+            ->willReturn(
+                [$this->step, $this->step, $this->step,]
+            );
 
         $this->scenario
-            ->expects(self::any())
             ->method('getExamples')
-            ->will(self::returnValue([
-                $this->example,
-                $this->example,
-            ]));
+            ->willReturn(
+                [$this->example, $this->example,]
+            );
 
         $this->scenario
-            ->expects(self::any())
             ->method('getTags')
-            ->will(self::returnValue([
-                 'tag1',
-                 'tag2'
-             ]));
+            ->willReturn(
+                ['tag1', 'tag2']
+            );
 
         $this->feature
-            ->expects(self::any())
             ->method('getScenarios')
-            ->will(self::returnValue([
-                $this->scenario,
-                $this->scenario,
-            ]));
+            ->willReturn(
+                [$this->scenario, $this->scenario,]
+            );
 
         $this->feature
-            ->expects(self::any())
             ->method('getTags')
-            ->will(self::returnValue([
-                'tag1',
-                'tag2'
-            ]));
+            ->willReturn(
+                ['tag1', 'tag2']
+            );
 
         $this->suite
-            ->expects(self::any())
             ->method('getFeatures')
-            ->will(self::returnValue([
-                $this->feature,
-                $this->feature,
-            ]));
+            ->willReturn(
+                [$this->feature, $this->feature,]
+            );
 
         $this->formatter
-            ->expects(self::any())
             ->method('getSuites')
-            ->will(self::returnValue([
-                $this->suite,
-            ]));
+            ->willReturn(
+                [$this->suite,]
+            );
     }
 
-    /**
-     * @param array  $keys
-     * @param array  $array
-     * @param string $message
-     */
-    protected function assertArrayHasKeys(array $keys, array $array, $message = '')
+    protected static function assertArrayHasKeys(array $keys, array $array): void
     {
         foreach ($keys as $key) {
-            self::assertArrayHasKey($key, $array, $message);
+            self::assertArrayHasKey($key, $array);
         }
     }
 }

@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vanare\BehatCucumberJsonFormatter\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Vanare\BehatCucumberJsonFormatter\Node\Step;
 use Behat\Testwork\Tester\Result\TestResult;
 
-class StepTest extends \PHPUnit_Framework_TestCase
+class StepTest extends TestCase
 {
     /**
      * @test
      */
-    public function getProcessedResultReturnsPassedStructure()
+    public function getProcessedResultReturnsPassedStructure(): void
     {
         // Arrange
         $passedResult = $this->getMockBuilder(TestResult::class)->getMock();
@@ -21,16 +24,16 @@ class StepTest extends \PHPUnit_Framework_TestCase
         $result = $step->getProcessedResult();
 
         // Assert
-        $this->assertTrue(is_array($result));
-        $this->assertArrayHasKey('status', $result);
-        $this->assertEquals(Step::$resultLabels[$resultCode], $result['status']);
-        $this->assertArrayHasKey('duration', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('status', $result);
+        static::assertEquals(Step::$resultLabels[$resultCode], $result['status']);
+        static::assertArrayHasKey('duration', $result);
     }
 
     /**
      * @test
      */
-    public function getProcessedResultReturnsFailedStructure()
+    public function getProcessedResultReturnsFailedStructure(): void
     {
         // Arrange
         $failedResult = $this->getMockBuilder(TestResult::class)->getMock();
@@ -41,19 +44,13 @@ class StepTest extends \PHPUnit_Framework_TestCase
         $result = $step->getProcessedResult();
 
         // Assert
-        $this->assertTrue(is_array($result));
-        $this->assertArrayHasKey('status', $result);
-        $this->assertEquals(Step::$resultLabels[$resultCode], $result['status']);
-        $this->assertArrayHasKey('duration', $result);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('status', $result);
+        static::assertEquals(Step::$resultLabels[$resultCode], $result['status']);
+        static::assertArrayHasKey('duration', $result);
     }
 
-    /**
-     * @param TestResult $result
-     * @param $resultCode
-     *
-     * @return Step
-     */
-    protected function createStep(TestResult $result, $resultCode)
+    protected function createStep(TestResult $result, $resultCode): Step
     {
         $step = new Step();
         $step->setResult($result);
