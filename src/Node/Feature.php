@@ -150,7 +150,6 @@ class Feature
 
     public function addScenario(Scenario $scenario): void
     {
-        # FIXME $scenario->setId($this->scenarioCounter);
         $this->scenarioCounter++;
         $this->scenarios[] = $scenario;
     }

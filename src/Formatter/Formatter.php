@@ -172,7 +172,6 @@ class Formatter implements FormatterInterface
     public function onBeforeFeatureTested(BehatEvent\BeforeFeatureTested $event): void
     {
         $feature = new Node\Feature();
-        # FIXME $feature->setId($this->featureCounter);
         ++$this->featureCounter;
         $feature->setName($event->getFeature()->getTitle());
         $feature->setDescription($event->getFeature()->getDescription());
@@ -294,10 +293,9 @@ class Formatter implements FormatterInterface
     {
         $this->timer->stop();
 
-        /** @var Result\ExecutedStepResult $result */
         $result = $event->getTestResult();
 
-        if ($result instanceof Result\UndefinedStepResult || $result instanceof Result\SkippedStepResult) {
+        if (!($result instanceof Result\ExecutedStepResult)) {
             return;
         }
 

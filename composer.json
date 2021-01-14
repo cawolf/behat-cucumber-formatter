@@ -41,7 +41,7 @@
   },
   "scripts": {
     "test": [
-      "bin/phpstan analyse --no-progress -l 3 src",
+      "bin/phpstan analyse --no-progress -l 5 src",
       "bin/phpunit",
       "bin/behat"
     ]
